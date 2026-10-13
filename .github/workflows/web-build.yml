@@ -1,28 +1,44 @@
-name: Install dependencies and verify web build
+name: FIELDWORK web CI
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: web-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Install
+      # Until the lockfile is committed, install and retain the resolved lockfile.
+      # After committing it, switch this to npm ci.
+      - name: Install dependencies
         run: npm install --no-audit --no-fund
-      - name: Unit tests
+      - name: Numerical regression tests
         run: npm test
-      - name: Production build
+      - name: Build production web app
         run: npm run build
-      - name: Save generated lockfile and build
+      - name: Install Chromium for Playwright
+        run: npx playwright install --with-deps chromium
+      - name: Browser smoke tests (desktop and iPhone viewport)
+        run: npm run test:e2e
+      - name: Save web build and lockfile
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: fieldwork-web-build-and-lock
+          name: fieldwork-web-build
           path: |
-            package-lock.json
             dist/
+            package-lock.json
+            playwright-report/
+            test-results/
           if-no-files-found: warn
+          retention-days: 14
