@@ -36,9 +36,9 @@ function Calculator(){
 
 function ImpedanceSynthesis({stackup}){
  const [target,setTarget]=useState(50),[h,setH]=useState(0.18),[t,setT]=useState(35),[er,setEr]=useState(4.2),[width,setWidth]=useState(0.35);
- const [stackupSide,setStackupSide]=useState("manual");
+ const [stackupSide,setStackupSide]=useState("manual");const [freqGHz,setFreqGHz]=useState(1);
  let linked=null,linkedError=null;
- if(stackupSide!=="manual"){try{linked=surfaceMicrostripGeometry(stackup,stackupSide)}catch(e){linkedError=e.message}}
+ if(stackupSide!=="manual"){try{linked=surfaceMicrostripGeometry(stackup,stackupSide,freqGHz)}catch(e){linkedError=e.message}}
  const params=linked??{heightMm:Number(h),thicknessUm:Number(t),er:Number(er)};
  let analysis,synthesis,error;
  try{
@@ -51,6 +51,7 @@ function ImpedanceSynthesis({stackup}){
  <SimpleGrid cols={{base:1,md:2}}>
  <Paper withBorder p="lg"><Stack gap="sm">
  <Text fw={700}>Geometry and dielectric</Text>
+ <NumberInput label="Analysis frequency" suffix=" GHz" value={freqGHz} min={0.001} onChange={setFreqGHz}/>
  <Select label="Geometry source" value={stackupSide} onChange={setStackupSide} data={[{value:"manual",label:"Manual values"},{value:"top",label:"Active stackup · top signal"},{value:"bottom",label:"Active stackup · bottom signal"}]}/>
  {linked&&<Text size="xs" c="teal">Linked to {stackup.name}; edits to the stackup update impedance automatically.</Text>}
  {linkedError&&<Alert color="red">{linkedError}</Alert>}
@@ -79,7 +80,7 @@ function ImpedanceSynthesis({stackup}){
  <Text size="xs" c="dimmed">Achieved: {synthesis.achievedOhms.toFixed(4)} Ω; constrained to 0.025–10 mm width</Text>
  </>}</Paper>
  </Stack></SimpleGrid>
- <Alert color="yellow" title="Engineering limitations">Quasi-static single microstrip model. No soldermask, loss, dispersion, roughness or full-wave field effects. Synthesis is limited to a finite manufacturable search interval.</Alert>
+ <Alert color="yellow" title="Engineering limitations">Quasi-static single microstrip model. No soldermask, loss, causal broadband dispersion, roughness or full-wave field effects. Dk(f) uses source-attributed samples and bounded interpolation if defined in stackup JSON. Synthesis is limited to a finite manufacturable search interval.</Alert>
  <Paper withBorder p="lg"><Text fw={700}>Equation provenance</Text><Text size="sm">Hammerstad & Jensen (1980), finite-copper-thickness microstrip equations; <a href="https://qucs.github.io/tech/node75.html" target="_blank" rel="noreferrer">Qucs theory reference</a>. Numerical verification covers inverse consistency; independent EM comparison remains outstanding.</Text></Paper>
  </Stack>
 }
@@ -87,5 +88,5 @@ function ImpedanceSynthesis({stackup}){
 function getSafeStorage(){try{return typeof window==="undefined"?null:window.localStorage}catch{return null}}
 function App(){const [open,setOpen]=useState(false);const [active,setActive]=useState("thermal");const [stackup,setStackup]=useState(()=>loadLocalStackup(getSafeStorage()).stackup);
 const [saveWarning,setSaveWarning]=useState("");
-useEffect(()=>{const result=saveLocalStackup(getSafeStorage(),stackup);setSaveWarning(result.error??"");},[stackup]);return <AppShell header={{height:64}} navbar={{width:240,breakpoint:"sm",collapsed:{mobile:!open}}} padding="lg"><AppShell.Header><Group h="100%" px="lg" justify="space-between"><Group><Burger aria-label="Toggle navigation" opened={open} onClick={()=>setOpen(!open)} hiddenFrom="sm" size="sm"/><Box bg="teal" c="white" fw={900} px="sm" py={5} style={{borderRadius:8}}>F</Box><div><Text fw={800} lh="xs">FIELDWORK PCB</Text><Text size="xs" c="dimmed">ENGINEERING STUDIO</Text></div></Group><Badge variant="light" color="teal">v0.18</Badge></Group></AppShell.Header><AppShell.Navbar p="md" style={{background:"#102b33",color:"white"}}><Text fw={700} size="xs" c="gray.4">WORKSPACES</Text><NavLink mt="sm" active={active==="thermal"} label="Conductor thermal" onClick={()=>{setActive("thermal");setOpen(false);}}/><NavLink active={active==="microstrip"} label="Microstrip design" onClick={()=>{setActive("microstrip");setOpen(false);}}/><NavLink active={active==="via"} label="Via parameters" onClick={()=>{setActive("via");setOpen(false);}}/><NavLink active={active==="stackup"} label="Stackup designer" onClick={()=>{setActive("stackup");setOpen(false);}}/><Text size="xs" mt="xl" c="gray.4">Remaining calculators will migrate after parity testing. Existing standalone app is distributed in the v0.14 package.</Text></AppShell.Navbar><AppShell.Main><Box maw={1150} mx="auto">{saveWarning&&<Alert color="yellow" mb="md">{saveWarning}</Alert>}{active==="thermal"?<Calculator/>:active==="microstrip"?<ImpedanceSynthesis stackup={stackup}/>:active==="via"?<ViaWorkspace stackup={stackup}/>:<StackupWorkspace stackup={stackup} setStackup={setStackup}/>}</Box></AppShell.Main></AppShell>}
+useEffect(()=>{const result=saveLocalStackup(getSafeStorage(),stackup);setSaveWarning(result.error??"");},[stackup]);return <AppShell header={{height:64}} navbar={{width:240,breakpoint:"sm",collapsed:{mobile:!open}}} padding="lg"><AppShell.Header><Group h="100%" px="lg" justify="space-between"><Group><Burger aria-label="Toggle navigation" opened={open} onClick={()=>setOpen(!open)} hiddenFrom="sm" size="sm"/><Box bg="teal" c="white" fw={900} px="sm" py={5} style={{borderRadius:8}}>F</Box><div><Text fw={800} lh="xs">FIELDWORK PCB</Text><Text size="xs" c="dimmed">ENGINEERING STUDIO</Text></div></Group><Badge variant="light" color="teal">v0.19</Badge></Group></AppShell.Header><AppShell.Navbar p="md" style={{background:"#102b33",color:"white"}}><Text fw={700} size="xs" c="gray.4">WORKSPACES</Text><NavLink mt="sm" active={active==="thermal"} label="Conductor thermal" onClick={()=>{setActive("thermal");setOpen(false);}}/><NavLink active={active==="microstrip"} label="Microstrip design" onClick={()=>{setActive("microstrip");setOpen(false);}}/><NavLink active={active==="via"} label="Via parameters" onClick={()=>{setActive("via");setOpen(false);}}/><NavLink active={active==="stackup"} label="Stackup designer" onClick={()=>{setActive("stackup");setOpen(false);}}/><Text size="xs" mt="xl" c="gray.4">Remaining calculators will migrate after parity testing. Existing standalone app is distributed in the v0.14 package.</Text></AppShell.Navbar><AppShell.Main><Box maw={1150} mx="auto">{saveWarning&&<Alert color="yellow" mb="md">{saveWarning}</Alert>}{active==="thermal"?<Calculator/>:active==="microstrip"?<ImpedanceSynthesis stackup={stackup}/>:active==="via"?<ViaWorkspace stackup={stackup}/>:<StackupWorkspace stackup={stackup} setStackup={setStackup}/>}</Box></AppShell.Main></AppShell>}
 createRoot(document.getElementById("root")).render(<MantineProvider theme={{primaryColor:"teal",defaultRadius:"md"}}><App/></MantineProvider>);
