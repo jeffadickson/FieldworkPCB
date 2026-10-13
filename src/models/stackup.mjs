@@ -1,3 +1,4 @@
+import {validateDielectricCurve,interpolateDielectric} from "./material-dispersion.mjs";
 /** Portable FIELDWORK stackup schema v1 (all thicknesses in mm). */
 export const MATERIALS=Object.freeze({
  "FR4":{label:"Generic FR-4 (illustrative)",er:4.2},
@@ -26,7 +27,7 @@ export function validateStackup(s){
   ids.add(l.id);
   if(!Number.isFinite(l.thicknessMm)||l.thicknessMm<=0||l.thicknessMm>10)throw new Error("Invalid layer thickness");
   if(kind==="copper"){copper++;if(!["signal","ground","power","mixed"].includes(l.role))throw new Error("Invalid copper role");}
-  else if(!Number.isFinite(l.er)||l.er<1||l.er>30||typeof l.material!=="string"||l.material.length>80)throw new Error("Invalid dielectric");
+  else {if(!Number.isFinite(l.er)||l.er<1||l.er>30||typeof l.material!=="string"||l.material.length>80)throw new Error("Invalid dielectric");if(l.dielectricCurve!==undefined)validateDielectricCurve(l.dielectricCurve);}
  });
  if(copper<2)throw new Error("At least two copper layers required");
  const totalMm=s.layers.reduce((a,l)=>a+l.thicknessMm,0);
@@ -39,7 +40,7 @@ export function parseStackup(json){
  // Whitelist schema fields to avoid extra properties carrying untrusted data.
  return {format:"fieldwork.stackup",version:1,name:obj.name,layers:obj.layers.map(l=>l.type==="copper"?
  {id:l.id,type:"copper",role:l.role,thicknessMm:l.thicknessMm}:
- {id:l.id,type:"dielectric",material:l.material,er:l.er,thicknessMm:l.thicknessMm})};
+ {id:l.id,type:"dielectric",material:l.material,er:l.er,thicknessMm:l.thicknessMm,...(l.dielectricCurve?{dielectricCurve:{source:l.dielectricCurve.source,points:l.dielectricCurve.points.map(p=>({frequencyGHz:p.frequencyGHz,er:p.er,df:p.df}))}}:{})})};
 }
 export function serializeStackup(s){validateStackup(s);return JSON.stringify(parseStackup(JSON.stringify(s)),null,2);}
 export function addInnerPair(s){
@@ -50,10 +51,11 @@ export function addInnerPair(s){
  copy.layers.splice(k-2,0,{id:"D"+Date.now().toString(36),type:"dielectric",material:"FR4",er:4.2,thicknessMm:.18},{id:"L"+Date.now().toString(36),type:"copper",role:"signal",thicknessMm:.035});
  validateStackup(copy);return copy;
 }
-export function surfaceMicrostripGeometry(s,side="top"){
+export function surfaceMicrostripGeometry(s,side="top",frequencyGHz=null){
  validateStackup(s);
  const seq=side==="bottom"?[...s.layers].reverse():s.layers;
  if(seq[0].role!=="signal")throw new Error("Outer conductor is not a signal layer");
  if(!["ground","power"].includes(seq[2].role))throw new Error("Adjacent copper must be reference plane");
- return {heightMm:seq[1].thicknessMm,er:seq[1].er,thicknessUm:seq[0].thicknessMm*1000};
+ const sample=frequencyGHz!==null&&seq[1].dielectricCurve?interpolateDielectric(seq[1].dielectricCurve,frequencyGHz):null;
+ return {heightMm:seq[1].thicknessMm,er:sample?.er??seq[1].er,thicknessUm:seq[0].thicknessMm*1000};
 }
