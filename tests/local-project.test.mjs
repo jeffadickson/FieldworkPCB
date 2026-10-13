@@ -1,0 +1,14 @@
+import assert from "node:assert/strict";
+import {loadLocalStackup,saveLocalStackup,PROJECT_STORAGE_KEY} from "../src/models/local-project.mjs";
+import {starterStackup} from "../src/models/stackup.mjs";
+const map=new Map(),storage={getItem:k=>map.get(k)??null,setItem:(k,v)=>map.set(k,v)};
+assert.deepEqual(loadLocalStackup(storage).stackup,starterStackup());
+const board=starterStackup();board.layers[1].er=3.51;
+assert.equal(saveLocalStackup(storage,board).ok,true);
+assert.equal(loadLocalStackup(storage).stackup.layers[1].er,3.51);
+map.set(PROJECT_STORAGE_KEY,'{"invalid":true}');
+const bad=loadLocalStackup(storage);assert.ok(bad.warning);assert.deepEqual(bad.stackup,starterStackup());
+const denied={getItem:()=>{throw Error("denied")},setItem:()=>{throw Error("denied")}};
+assert.ok(loadLocalStackup(denied).warning);
+assert.equal(saveLocalStackup(denied,board).ok,false);
+console.log("Offline stackup persistence checks passed");
