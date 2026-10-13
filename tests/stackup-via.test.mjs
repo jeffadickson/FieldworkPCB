@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import {starterStackup,validateStackup,parseStackup,serializeStackup,surfaceMicrostripGeometry} from '../src/models/stackup.mjs';
+import {viaDC} from '../src/models/via.mjs';
+const board=starterStackup(),total=validateStackup(board);
+assert.ok(total.totalMm>1.5&&total.totalMm<1.7);
+assert.deepEqual(parseStackup(serializeStackup(board)),board);
+assert.equal(surfaceMicrostripGeometry(board).heightMm,.18);
+assert.equal(surfaceMicrostripGeometry(board,"bottom").thicknessUm,35);
+assert.throws(()=>parseStackup(JSON.stringify({...board,version:2})));
+assert.throws(()=>parseStackup(JSON.stringify({...board,layers:board.layers.slice(0,2)})));
+assert.throws(()=>parseStackup("x".repeat(100001)));
+const a=viaDC({boardMm:1.6,holeMm:.3,platingUm:25,currentA:1});
+const b=viaDC({boardMm:1.6,holeMm:.3,platingUm:50,currentA:1});
+assert.ok(a.resistanceOhms>b.resistanceOhms);
+assert.ok(Math.abs(a.powerW-a.resistanceOhms)<1e-12);
+assert.equal(viaDC({boardMm:1.6,holeMm:.3,platingUm:25,currentA:2}).voltageDropV,2*a.resistanceOhms);
+assert.throws(()=>viaDC({boardMm:0,holeMm:.3,platingUm:25}));
+console.log("Stackup v1 roundtrip and via DC checks passed");
