@@ -14,3 +14,19 @@ test('microstrip analysis and target impedance synthesis', async ({page,isMobile
   await expect(page.getByText('Width for 50.0 Ω')).toBeVisible();
   await expect(page.locator('body')).not.toContainText('NaN');
 });
+
+test('stackup editor changes via thickness and supports local export',async({page,isMobile})=>{
+ await page.goto('/');
+ const navigate=async(label)=>{if(isMobile)await page.getByRole('button',{name:'Toggle navigation'}).click();await page.getByText(label,{exact:true}).last().click();};
+ await navigate('Stackup designer');
+ await expect(page.getByRole('heading',{name:'Stackup designer'})).toBeVisible();
+ await expect(page.getByText('1.600 mm total')).toBeVisible();
+ const downloadPromise=page.waitForEvent('download');
+ await page.getByRole('button',{name:'Save JSON'}).click();
+ const download=await downloadPromise;
+ expect(download.suggestedFilename()).toMatch(/stackup\.json$/);
+ await navigate('Via parameters');
+ await expect(page.getByRole('heading',{name:'Via parameters'})).toBeVisible();
+ await expect(page.getByText('Board thickness')).toBeVisible();
+ await expect(page.getByText('Electrical results')).toBeVisible();
+});
