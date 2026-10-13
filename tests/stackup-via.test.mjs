@@ -23,3 +23,9 @@ assert.ok(Math.abs(a.powerW-a.resistanceOhms)<1e-12);
 assert.equal(viaDC({boardMm:1.6,holeMm:.3,platingUm:25,currentA:2}).voltageDropV,2*a.resistanceOhms);
 assert.throws(()=>viaDC({boardMm:0,holeMm:.3,platingUm:25}));
 console.log("Stackup v1 roundtrip and via DC checks passed");
+
+const broadband=starterStackup();
+broadband.layers[1].dielectricCurve={source:"Synthetic test data",points:[{frequencyGHz:1,er:4.2,df:.02},{frequencyGHz:10,er:3.8,df:.03}]};
+assert.deepEqual(parseStackup(serializeStackup(broadband)),broadband);
+assert.ok(Math.abs(surfaceMicrostripGeometry(broadband,"top",Math.sqrt(10)).er-4)<1e-12);
+assert.throws(()=>surfaceMicrostripGeometry(broadband,"top",100),RangeError);
