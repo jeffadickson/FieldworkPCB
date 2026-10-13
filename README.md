@@ -1,6 +1,6 @@
 # FIELDWORK PCB
 
-A modern, reference-backed PCB engineering workbench. **v0.15 development snapshot on main:** React + Mantine, Brooks–Adam conductor heating, and Hammerstad–Jensen microstrip impedance synthesis.
+A modern, reference-backed PCB engineering workbench. **v0.16 development snapshot on main:** React + Mantine, Brooks–Adam conductor heating, and Hammerstad–Jensen microstrip impedance synthesis.
 
 ## Run the new web application
 
@@ -16,7 +16,10 @@ React requires downloading the dependencies. Node-only numerical tests have been
 
 ## Available in GitHub now
 
-- `src/main.jsx`: responsive React + Mantine conductor-heating and microstrip-synthesis workspaces.
+- `src/main.jsx`: React + Mantine navigation for thermal, microstrip, via and stackup workspaces.
+- `src/BoardWorkspaces.jsx`: phone-responsive via and stackup editor with local JSON save/load.
+- `src/models/stackup.mjs`: validated versioned layer schema, material presets and geometry lookup.
+- `src/models/via.mjs`: first-order temperature-adjusted plated-barrel DC resistance.
 - `src/models/microstrip-synthesis.mjs`: reference-backed microstrip analysis and target-impedance width synthesis.
 - `tests/microstrip-synthesis.test.mjs`: forward/inverse regression cases.
 - `docs/FEATURE_BACKLOG_STRIDE.md`: missing-feature inventory and STRIDE security requirements.
@@ -25,7 +28,7 @@ React requires downloading the dependencies. Node-only numerical tests have been
 - `tests/brooks-adam.test.mjs`: arithmetic, inverse, and invalid-input checks.
 - `docs/BROOKS_ADAM_REFERENCES.md`: published coefficient provenance, units, and limitations.
 
-The rest of the previous standalone calculators, JSON stackup designer, and related numerical modules are preserved in the downloadable v0.14 project archive, but are **not yet fully migrated into this GitHub repository**. They must be integrated and parity-tested before claiming feature completeness. Capacitor scaffolding and manually triggered native CI workflows have been added, but **native builds have not yet been verified**. Signed App Store distribution is not configured.
+The previous standalone calculator archive and some advanced stackup capabilities are preserved in the downloadable v0.14 project archive, but are **not yet fully migrated into this GitHub repository**. They must be integrated and parity-tested before claiming feature completeness. Capacitor scaffolding and manually triggered native CI workflows have been added, but **native builds have not yet been verified**. Signed App Store distribution is not configured.
 
 ## Source and qualification
 
@@ -42,3 +45,7 @@ The proprietary Saturn binary and Saturn reference tester belong in a separate r
 - [Pages preview](../../actions/workflows/pages-preview.yml): optional manual deployment for phone-browser testing. Enable GitHub Pages with Actions as the source first.
 
 The first successful run is **not yet confirmed**. See `docs/CI_MOBILE_BUILDS.md` for details. A generated npm lockfile is not yet committed.
+
+## v0.16 migration caveats
+
+This React stackup editor introduces a deliberately limited `fieldwork.stackup` schema v1: alternating copper/dielectric layers, generic Dk presets, geometry validation and local JSON files. **Compatibility with the older standalone stackup JSON format has not been established**; existing saved projects must not be assumed to import unchanged. The via workspace currently uses total stackup thickness for DC resistance only; no via EM/thermal solver has been ported. Browser and native CI green status have not been verified by this update.
