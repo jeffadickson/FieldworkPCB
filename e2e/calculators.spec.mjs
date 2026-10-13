@@ -30,3 +30,17 @@ test('stackup editor changes via thickness and supports local export',async({pag
  await expect(page.getByText('Board thickness')).toBeVisible();
  await expect(page.getByText('Electrical results')).toBeVisible();
 });
+
+test('microstrip tracks the active stackup',async({page,isMobile})=>{
+ await page.goto('/');
+ const nav=async(label)=>{if(isMobile)await page.getByRole('button',{name:'Toggle navigation'}).click();await page.getByText(label,{exact:true}).last().click();};
+ await nav('Microstrip design');
+ await page.getByRole('textbox',{name:'Geometry source'}).click();
+ await page.getByRole('option',{name:/Active stackup · top signal/}).click();
+ await expect(page.getByText(/Linked to Four-layer example/)).toBeVisible();
+ await expect(page.getByRole('textbox',{name:'Reference plane distance'})).toBeDisabled();
+ await nav('Stackup designer');
+ await expect(page.getByRole('heading',{name:'Stackup designer'})).toBeVisible();
+ await nav('Microstrip design');
+ await expect(page.getByRole('heading',{name:'Microstrip design'})).toBeVisible();
+});
