@@ -1,6 +1,6 @@
 # FIELDWORK PCB
 
-A modern, reference-backed PCB engineering workbench. **v0.16 development snapshot on main:** React + Mantine, Brooks–Adam conductor heating, and Hammerstad–Jensen microstrip impedance synthesis.
+A modern, reference-backed PCB engineering workbench. **v0.17 development snapshot on main:** React + Mantine, Brooks–Adam conductor heating, and Hammerstad–Jensen microstrip impedance synthesis.
 
 ## Run the new web application
 
@@ -49,3 +49,9 @@ The first successful run is **not yet confirmed**. See `docs/CI_MOBILE_BUILDS.md
 ## v0.16 migration caveats
 
 This React stackup editor introduces a deliberately limited `fieldwork.stackup` schema v1: alternating copper/dielectric layers, generic Dk presets, geometry validation and local JSON files. **Compatibility with the older standalone stackup JSON format has not been established**; existing saved projects must not be assumed to import unchanged. The via workspace currently uses total stackup thickness for DC resistance only; no via EM/thermal solver has been ported. Browser and native CI green status have not been verified by this update.
+
+## v0.17 stackup-linked impedance
+
+Microstrip analysis and target-width synthesis now accept geometry sourced from the active top or bottom signal layer. The adjacent dielectric supplies spacing and relative permittivity; the selected outer copper supplies finished thickness. Only configurations with a directly adjacent ground/power reference plane are accepted. Manual input remains available. Changes made in Stackup Designer propagate into the calculator while linked. This is the documented **single homogeneous dielectric / quasi-static microstrip** approximation, not a solver for inner-layer stripline or complex return-current environments.
+
+The standalone v0.5 stackup JSON schema and this new React schema have not been proven compatible. Existing saved designs must be migrated explicitly before claiming file compatibility. React build, E2E, and native artifacts remain subject to GitHub Actions execution.
