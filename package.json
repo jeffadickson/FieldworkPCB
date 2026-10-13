@@ -1,12 +1,12 @@
 {
   "name": "fieldwork-pcb",
-  "version": "0.17.0",
+  "version": "0.18.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
-    "test": "node tests/brooks-adam.test.mjs && node tests/microstrip-synthesis.test.mjs && node tests/stackup-via.test.mjs",
+    "test": "node tests/brooks-adam.test.mjs && node tests/microstrip-synthesis.test.mjs && node tests/stackup-via.test.mjs && node tests/local-project.test.mjs",
     "preview": "vite preview",
     "test:e2e": "playwright test",
     "build:android": "npm run build && npx cap sync android",
