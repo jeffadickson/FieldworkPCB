@@ -25,6 +25,21 @@ Status: 2026-10-13. Source comparison: ShinePCB/calculation (GPL-3.0-or-later), 
 | FW-QA-001 | P0 | Test provenance | Equation ID, paper URL/page/equation, accuracy limits and fixture origins | In progress |
 | FW-QA-002 | P0 | Playwright E2E and CI | Browser full flows, mobile viewport, tests and build gates | Planned |
 
+## Tracked GitHub work queue
+
+- [#1 CI and lockfile](https://github.com/jeffadickson/FieldworkPCB/issues/1) — P0
+- [#2 Legacy stackup JSON migration](https://github.com/jeffadickson/FieldworkPCB/issues/2) — P0
+- [#3 Phone-first via and stackup](https://github.com/jeffadickson/FieldworkPCB/issues/3) — P0, **partial**: local persistence committed in v0.18
+- [#4 Frequency-dependent materials](https://github.com/jeffadickson/FieldworkPCB/issues/4) — P0
+- [#5 Thermal/IPC-2152 qualification](https://github.com/jeffadickson/FieldworkPCB/issues/5) — P0, standard data pending
+- [#6 Coupled-line synthesis](https://github.com/jeffadickson/FieldworkPCB/issues/6) — P0
+- [#7 RF model expansion](https://github.com/jeffadickson/FieldworkPCB/issues/7) — P1
+- [#8 iOS/Android release pipeline](https://github.com/jeffadickson/FieldworkPCB/issues/8) — P1
+- [#9 Model provenance and STRIDE mitigations](https://github.com/jeffadickson/FieldworkPCB/issues/9) — P1
+- [#10 Saturn/KiCad comparisons](https://github.com/jeffadickson/FieldworkPCB/issues/10) — P1
+
+Do not close issues until automated tests and acceptance criteria have passed.
+
 ## STRIDE security requirements
 Applies to project JSON imports, offline storage, native wrappers, update pipeline, and reference metadata.
 
