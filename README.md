@@ -1,40 +1,31 @@
 # FIELDWORK PCB
 
-A browser-based PCB engineering design workbench with transparent calculation models, interactive diagrams, stackup editing, and traceable engineering references.
+A modern, reference-backed PCB engineering workbench. **v0.14 development branch on main:** React + Mantine scaffold and the published Brooks–Adam empirical conductor-heating model.
 
-## Project status
+## Run the new web application
 
-The current development snapshot is **v0.13 (Signal Propagation)**. The source has been developed locally and is **not yet committed to this GitHub repository**.
+```sh
+npm install
+npm run dev
+npm test
+npm run build
+```
 
-Features in the local snapshot include:
+React requires downloading the dependencies. Node-only numerical tests have been executed locally; the new Vite production build has **not** yet been verified in the execution environment because its dependencies are not installed there.
 
-- PCB stackup editor with versioned JSON save/load
-- Via geometry and first-order electrical models
-- Hammerstad–Jensen microstrip impedance
-- Preliminary differential-pair and symmetric stripline models
-- Conductor resistance and thermal scenario calculations
-- Plane capacitance, PDN, reactance, and signal propagation
-- Material presets, documented assumptions, and numerical tests
+## Available in GitHub now
 
-## Engineering qualification
+- `src/main.jsx`: responsive React + Mantine conductor-heating workspace.
+- `src/models/brooks-adam-thermal.mjs`: published fits with finite-input validation and inverse sizing.
+- `tests/brooks-adam.test.mjs`: arithmetic, inverse, and invalid-input checks.
+- `docs/BROOKS_ADAM_REFERENCES.md`: published coefficient provenance, units, and limitations.
 
-This is an evolving engineering prototype. Model provenance, validity limits, and verification levels must be clearly presented to users. Some calculations are approximations and are not substitutes for measured data or EM/thermal simulations.
+The rest of the previous standalone calculators, JSON stackup designer, and related numerical modules are preserved in the downloadable v0.14 project archive, but are **not yet fully migrated into this GitHub repository**. They must be integrated and parity-tested before claiming feature completeness. Capacitor/iOS packaging is planned but **not implemented**.
 
-**IPC-2152 fitting and Saturn thermal coefficient extraction are currently on hold** pending access to a legitimately obtained standard and suitable validation data.
+## Source and qualification
 
-## Source organization (planned)
+Douglas G. Brooks and Johannes Adam (2015), *Trace Currents and Temperatures Revisited*, Eq. 3-2, Table 3-1, Appendix 6: https://www.mathscinotes.com/wp-content/uploads/2016/06/pcbtempr.pdf
 
-- `docs/` — requirements, coverage and reference registers
-- `fixtures/` — non-proprietary numerical test vectors
-- `*.mjs` — calculation modules and automated tests
-- `index.html` / `app.mjs` — browser interface
+The conductor-heating fits are **not** an IPC-2152 compliance claim or a board-level thermal simulation. Nearby copper, material anisotropy, environment, fabrication, and boundary conditions matter. Numerical input/forward/inverse tests are available. Real Saturn, IPC chart, independent thermal-solver and measured-board validation are outstanding.
 
-The proprietary Saturn PCB Toolkit application and the separate Saturn reference-test harness are **not** to be included in this repository.
-
-## Development principles
-
-1. Favor independent published engineering equations and preserve citations.
-2. Test numerical behavior, units, edge cases, and applicability constraints.
-3. Keep calculation code separate from presentation.
-4. Maintain an original, modern interface rather than copying Saturn's UI.
-5. Keep reference-test automation in its own repository.
+The proprietary Saturn binary and Saturn reference tester belong in a separate repository.
