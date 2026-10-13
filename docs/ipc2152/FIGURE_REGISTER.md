@@ -9,6 +9,12 @@ This register records figures supplied during research. **The source chart image
 | 5-4 | Low-area conductor-current detail | 5–100 mil² | Still air | User-supplied image, not committed |
 | 5-5 | Small-area conductor-current detail | 5–50 mil² | Still air | User-supplied image, not committed |
 
+| 5-10 | Vacuum baseline current and copper width; logarithmic imperial axes | 5–700 mil² | Vacuum | User-supplied image, not committed |
+| 5-11 | Vacuum conductor current; full-range linear imperial plot | 5–700 mil² | Vacuum | User-supplied image, not committed |
+| 5-12 | Vacuum conductor current; low-area linear imperial plot | 5–100 mil² | Vacuum | User-supplied image, not committed |
+| 5-13 | Vacuum conductor current; small-area linear imperial plot | 5–50 mil² | Vacuum | User-supplied image, not committed |
+| 5-14 | Vacuum conductor current and width; logarithmic metric axes | approximately 0.001–0.5 mm² (captioned) | Vacuum | User-supplied image, not committed |
+
 **Source:** IPC-2152, *Standard for Determining Current Carrying Capacity in Printed Board Design* (August 2009), §5 (figures identified above). Source publication is copyrighted by IPC.
 
 **Primary publisher:** https://www.ipc.org/
