@@ -1,5 +1,5 @@
 import {StackupWorkspace,ViaWorkspace} from "./BoardWorkspaces.jsx";
-import {starterStackup} from "./models/stackup.mjs";
+import {starterStackup,surfaceMicrostripGeometry} from "./models/stackup.mjs";
 import React,{useState} from "react";
 import {createRoot} from "react-dom/client";
 import "@mantine/core/styles.css";
@@ -33,22 +33,31 @@ function Calculator(){
  </Stack>;
 }
 
-function ImpedanceSynthesis(){
+function ImpedanceSynthesis({stackup}){
  const [target,setTarget]=useState(50),[h,setH]=useState(0.18),[t,setT]=useState(35),[er,setEr]=useState(4.2),[width,setWidth]=useState(0.35);
+ const [stackupSide,setStackupSide]=useState("manual");
+ let linked=null,linkedError=null;
+ if(stackupSide!=="manual"){try{linked=surfaceMicrostripGeometry(stackup,stackupSide)}catch(e){linkedError=e.message}}
+ const params=linked??{heightMm:Number(h),thicknessUm:Number(t),er:Number(er)};
  let analysis,synthesis,error;
  try{
-   analysis=microstrip({widthMm:Number(width),heightMm:Number(h),thicknessUm:Number(t),er:Number(er)});
-   synthesis=synthesizeMicrostrip({targetOhms:Number(target),heightMm:Number(h),thicknessUm:Number(t),er:Number(er)});
+   if(linkedError) throw new Error(linkedError);
+   analysis=microstrip({widthMm:Number(width),...params});
+   synthesis=synthesizeMicrostrip({targetOhms:Number(target),...params});
  }catch(e){error=e.message}
  return <Stack gap="md">
  <Group justify="space-between"><div><Title order={2}>Microstrip design</Title><Text c="dimmed" size="sm">Analyze impedance and synthesize width from a target</Text></div><Badge color="teal" variant="light">Hammerstad–Jensen</Badge></Group>
  <SimpleGrid cols={{base:1,md:2}}>
  <Paper withBorder p="lg"><Stack gap="sm">
  <Text fw={700}>Geometry and dielectric</Text>
+ <Select label="Geometry source" value={stackupSide} onChange={setStackupSide} data={[{value:"manual",label:"Manual values"},{value:"top",label:"Active stackup · top signal"},{value:"bottom",label:"Active stackup · bottom signal"}]}/>
+ {linked&&<Text size="xs" c="teal">Linked to {stackup.name}; edits to the stackup update impedance automatically.</Text>}
+ {linkedError&&<Alert color="red">{linkedError}</Alert>}
+
  <NumberInput label="Trace width" value={width} onChange={setWidth} suffix=" mm" min={0.01}/>
- <NumberInput label="Reference plane distance" value={h} onChange={setH} suffix=" mm" min={0.001}/>
- <NumberInput label="Copper thickness" value={t} onChange={setT} suffix=" µm" min={0}/>
- <NumberInput label="Relative permittivity (Dk)" value={er} onChange={setEr} min={1} decimalScale={3}/>
+ <NumberInput label="Reference plane distance" value={params.heightMm} onChange={setH} suffix=" mm" min={0.001} disabled={!!linked}/>
+ <NumberInput label="Copper thickness" value={params.thicknessUm} onChange={setT} suffix=" µm" min={0} disabled={!!linked}/>
+ <NumberInput label="Relative permittivity (Dk)" value={params.er} onChange={setEr} min={1} decimalScale={3} disabled={!!linked}/>
  <NumberInput label="Target impedance" value={target} onChange={setTarget} suffix=" Ω" min={1}/>
  </Stack></Paper>
  <Stack gap="md">
@@ -58,8 +67,8 @@ function ImpedanceSynthesis(){
  <rect x="12" y="138" width="376" height="7" fill="#c8954a"/>
  <rect x="160" y="49" width="80" height="9" rx="1" fill="#c8954a"/>
  <text x="200" y="32" fill="#204956" textAnchor="middle" fontSize="14">W = {Number(width).toFixed(3)} mm</text>
- <text x="30" y="98" fill="#204956" fontSize="13">Dk = {Number(er).toFixed(2)}</text>
- <text x="265" y="107" fill="#204956" fontSize="13">h = {Number(h).toFixed(3)} mm</text>
+ <text x="30" y="98" fill="#204956" fontSize="13">Dk = {Number(params.er).toFixed(2)}</text>
+ <text x="265" y="107" fill="#204956" fontSize="13">h = {Number(params.heightMm).toFixed(3)} mm</text>
  </svg></Paper>
  <Paper withBorder p="lg"><Text fw={700}>Results</Text>{error?<Alert color="red" title="Invalid geometry">{error}</Alert>:<>
  <Text size="sm" mt="sm" c="dimmed">Impedance of entered geometry</Text><Title order={2}>{analysis.impedanceOhms.toFixed(3)} Ω</Title>
@@ -74,5 +83,5 @@ function ImpedanceSynthesis(){
  </Stack>
 }
 
-function App(){const [open,setOpen]=useState(false);const [active,setActive]=useState("thermal");const [stackup,setStackup]=useState(starterStackup);return <AppShell header={{height:64}} navbar={{width:240,breakpoint:"sm",collapsed:{mobile:!open}}} padding="lg"><AppShell.Header><Group h="100%" px="lg" justify="space-between"><Group><Burger aria-label="Toggle navigation" opened={open} onClick={()=>setOpen(!open)} hiddenFrom="sm" size="sm"/><Box bg="teal" c="white" fw={900} px="sm" py={5} style={{borderRadius:8}}>F</Box><div><Text fw={800} lh="xs">FIELDWORK PCB</Text><Text size="xs" c="dimmed">ENGINEERING STUDIO</Text></div></Group><Badge variant="light" color="teal">v0.16</Badge></Group></AppShell.Header><AppShell.Navbar p="md" style={{background:"#102b33",color:"white"}}><Text fw={700} size="xs" c="gray.4">WORKSPACES</Text><NavLink mt="sm" active={active==="thermal"} label="Conductor thermal" onClick={()=>{setActive("thermal");setOpen(false);}}/><NavLink active={active==="microstrip"} label="Microstrip design" onClick={()=>{setActive("microstrip");setOpen(false);}}/><NavLink active={active==="via"} label="Via parameters" onClick={()=>{setActive("via");setOpen(false);}}/><NavLink active={active==="stackup"} label="Stackup designer" onClick={()=>{setActive("stackup");setOpen(false);}}/><Text size="xs" mt="xl" c="gray.4">Remaining calculators will migrate after parity testing. Existing standalone app is distributed in the v0.14 package.</Text></AppShell.Navbar><AppShell.Main><Box maw={1150} mx="auto">{active==="thermal"?<Calculator/>:active==="microstrip"?<ImpedanceSynthesis/>:active==="via"?<ViaWorkspace stackup={stackup}/>:<StackupWorkspace stackup={stackup} setStackup={setStackup}/>}</Box></AppShell.Main></AppShell>}
+function App(){const [open,setOpen]=useState(false);const [active,setActive]=useState("thermal");const [stackup,setStackup]=useState(starterStackup);return <AppShell header={{height:64}} navbar={{width:240,breakpoint:"sm",collapsed:{mobile:!open}}} padding="lg"><AppShell.Header><Group h="100%" px="lg" justify="space-between"><Group><Burger aria-label="Toggle navigation" opened={open} onClick={()=>setOpen(!open)} hiddenFrom="sm" size="sm"/><Box bg="teal" c="white" fw={900} px="sm" py={5} style={{borderRadius:8}}>F</Box><div><Text fw={800} lh="xs">FIELDWORK PCB</Text><Text size="xs" c="dimmed">ENGINEERING STUDIO</Text></div></Group><Badge variant="light" color="teal">v0.17</Badge></Group></AppShell.Header><AppShell.Navbar p="md" style={{background:"#102b33",color:"white"}}><Text fw={700} size="xs" c="gray.4">WORKSPACES</Text><NavLink mt="sm" active={active==="thermal"} label="Conductor thermal" onClick={()=>{setActive("thermal");setOpen(false);}}/><NavLink active={active==="microstrip"} label="Microstrip design" onClick={()=>{setActive("microstrip");setOpen(false);}}/><NavLink active={active==="via"} label="Via parameters" onClick={()=>{setActive("via");setOpen(false);}}/><NavLink active={active==="stackup"} label="Stackup designer" onClick={()=>{setActive("stackup");setOpen(false);}}/><Text size="xs" mt="xl" c="gray.4">Remaining calculators will migrate after parity testing. Existing standalone app is distributed in the v0.14 package.</Text></AppShell.Navbar><AppShell.Main><Box maw={1150} mx="auto">{active==="thermal"?<Calculator/>:active==="microstrip"?<ImpedanceSynthesis stackup={stackup}/>:active==="via"?<ViaWorkspace stackup={stackup}/>:<StackupWorkspace stackup={stackup} setStackup={setStackup}/>}</Box></AppShell.Main></AppShell>}
 createRoot(document.getElementById("root")).render(<MantineProvider theme={{primaryColor:"teal",defaultRadius:"md"}}><App/></MantineProvider>);
