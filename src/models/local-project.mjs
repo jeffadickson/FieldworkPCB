@@ -6,7 +6,7 @@ export function loadLocalStackup(storage){
   const raw=storage?.getItem(PROJECT_STORAGE_KEY);
   return raw?{stackup:parseStackup(raw),warning:null}:{stackup:starterStackup(),warning:null};
  }catch(e){
-  return {stackup:starterStackup(),warning:"Saved stackup could not be loaded; the example board is shown. Your stored data has not been overwritten."};
+  return {stackup:starterStackup(),warning:"Saved stackup could not be loaded; the example board is shown. Re-import a valid JSON backup if needed."};
  }
 }
 export function saveLocalStackup(storage,stackup){
