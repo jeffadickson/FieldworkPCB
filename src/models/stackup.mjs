@@ -46,8 +46,8 @@ export function addInnerPair(s){
  validateStackup(s);if(s.layers.length>45)throw new Error("Layer limit reached");
  const copy=parseStackup(JSON.stringify(s));
  const k=copy.layers.length;
- // add dielectric and copper before last outer copper, preserving alternating order
- copy.layers.splice(k-1,0,{id:"D"+Date.now().toString(36),type:"dielectric",material:"FR4",er:4.2,thicknessMm:.18},{id:"L"+Date.now().toString(36),type:"copper",role:"signal",thicknessMm:.035});
+ // add dielectric and copper before last dielectric and outer copper, preserving alternating order
+ copy.layers.splice(k-2,0,{id:"D"+Date.now().toString(36),type:"dielectric",material:"FR4",er:4.2,thicknessMm:.18},{id:"L"+Date.now().toString(36),type:"copper",role:"signal",thicknessMm:.035});
  validateStackup(copy);return copy;
 }
 export function surfaceMicrostripGeometry(s,side="top"){
