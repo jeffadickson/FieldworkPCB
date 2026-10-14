@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {conductorLoss} from '../src/models/conductor-loss.mjs';
+const p={frequencyGHz:1,widthMm:.3,heightMm:.18,impedanceOhms:50,lengthMm:100,thicknessUm:35};
+const a=conductorLoss(p),b=conductorLoss({...p,frequencyGHz:4});
+assert.ok(a.skinDepthUm>0&&a.sheetResistanceOhms>0);
+assert.ok(Math.abs(b.skinDepthUm/a.skinDepthUm-.5)<1e-12);
+assert.ok(Math.abs(b.dbPerMeter/a.dbPerMeter-2)<1e-12);
+assert.ok(Math.abs(a.totalDb-a.dbPerMeter*.1)<1e-12);
+assert.ok(conductorLoss({...p,widthMm:.6}).dbPerMeter<a.dbPerMeter);
+assert.throws(()=>conductorLoss({...p,widthMm:0}),RangeError);
+assert.throws(()=>conductorLoss({...p,frequencyGHz:0}),RangeError);
+assert.equal(conductorLoss({...p,thicknessUm:.01}).thickEnough,false);
+console.log("First-order conductor loss tests passed");
