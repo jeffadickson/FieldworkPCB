@@ -49,3 +49,19 @@ node tools/compare-kicad.mjs fixtures/kicad-verified-vectors.json
 ```
 
 The committed template is not a genuine KiCad capture and is expected to fail validation. Do not infer agreement from test harness self-tests.
+
+## Automated external C++ reference capture (v0.26)
+
+Run [KiCad reference comparison](https://github.com/jeffadickson/FieldworkPCB/actions/workflows/kicad-reference.yml) manually from GitHub Actions.
+
+This job checks out **ShinePCB/calculation** at pinned revision `79aab13534fd7f3dfecccbbbf8e33a04868bfc76` into `external-kicad/`. That repository contains a GPL-3.0-or-later KiCad-derived calculator compiled to WebAssembly. It is only used during the independent comparison job and is **not shipped in the FIELDWORK web/mobile application**.
+
+`tools/capture-kicad-wasm.mjs` calls the bridge's published numeric ABI: loads and configures microstrip models, executes `Analyse()`, and saves actual computed impedance results. The output records the pinned source revision, input geometry, frequency and secondary KiCad settings; `tools/compare-kicad.mjs` compares these values against the independent FIELDWORK model. Four geometric test cases are defined initially.
+
+Important qualifications:
+- This uses a **third-party port of KiCad's C++ calculator**, not an independently installed official KiCad GUI build. Treat provenance accordingly.
+- The job only uses the existing committed port WASM. It does not rebuild the C++ compiler source from scratch.
+- A 5% relative / 0.5-ohm absolute preliminary comparison threshold is a regression screening parameter, **not** an accuracy guarantee.
+- High-frequency dispersion, conductor conductivity, dielectric loss, and other setup differences can legitimately produce disagreement.
+- The job is **manual and unverified until its first GitHub Actions execution**.
+- Actual captures are written to GitHub Actions artifacts, not committed as fabricated source data.
