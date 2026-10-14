@@ -1,3 +1,4 @@
+import {ProjectOverview} from "./ProjectOverview.jsx";
 import {conductorLoss} from "./models/conductor-loss.mjs";
 import {microstripDielectricLoss} from "./models/dielectric-loss.mjs";
 import {interpolateDielectric} from "./models/material-dispersion.mjs";
@@ -98,10 +99,10 @@ function ImpedanceSynthesis({stackup}){
  </Stack>
 }
 
-const workspaces=[{id:"thermal",title:"Conductor thermal",symbol:"◉",category:"Power & thermal"},{id:"microstrip",title:"Microstrip design",symbol:"≈",category:"Signal integrity"},{id:"via",title:"Via parameters",symbol:"◎",category:"Interconnects"},{id:"stackup",title:"Stackup designer",symbol:"▤",category:"Board construction"}];
+const workspaces=[{id:"overview",title:"Project overview",symbol:"⌂",category:"Project"},{id:"thermal",title:"Conductor thermal",symbol:"◉",category:"Power & thermal"},{id:"microstrip",title:"Microstrip design",symbol:"≈",category:"Signal integrity"},{id:"via",title:"Via parameters",symbol:"◎",category:"Interconnects"},{id:"stackup",title:"Stackup designer",symbol:"▤",category:"Board construction"}];
 function getSafeStorage(){try{return typeof window==="undefined"?null:window.localStorage}catch{return null}}
 function App(){
- const [open,setOpen]=useState(false),[active,setActive]=useState("thermal");
+ const [open,setOpen]=useState(false),[active,setActive]=useState("overview");
  const [initialProject]=useState(()=>loadLocalStackup(getSafeStorage()));
  const [stackup,setStackupInternal]=useState(initialProject.stackup);
  const [edited,setEdited]=useState(false);
@@ -116,7 +117,7 @@ function App(){
     <Box style={{width:38,height:38,borderRadius:12,display:"grid",placeItems:"center",background:"#12646a",color:"#fff",fontSize:22,fontWeight:900}}>F</Box>
     <Box><Text fw={900} size="md" lh={1.1} style={{letterSpacing:"-.04em",color:"#173646"}}>FIELDWORK <span style={{color:"#138b8b"}}>PCB</span></Text><Text size="10px" fw={700} c="dimmed" style={{letterSpacing:".17em"}}>ENGINEERING STUDIO</Text></Box>
    </Group>
-   <Group gap="xs"><Badge color="teal" variant="light">LOCAL · OFFLINE</Badge><Badge variant="outline" color="gray">v0.31</Badge></Group>
+   <Group gap="xs"><Badge color="teal" variant="light">LOCAL · OFFLINE</Badge><Badge variant="outline" color="gray">v0.32</Badge></Group>
   </Group></AppShell.Header>
   <AppShell.Navbar className="fieldwork-nav" p="md"><Box px="sm" pt="lg" pb="sm"><Text size="10px" fw={800} style={{letterSpacing:".2em",color:"#84a6b1"}}>WORKSPACES</Text></Box>
    {workspaces.map(w=><NavLink key={w.id} active={active===w.id} label={<Group gap="xs"><Text fw={800} size="lg" style={{width:26,textAlign:"center"}}>{w.symbol}</Text><Text fw={700} size="sm">{w.title}</Text></Group>} onClick={()=>navigate(w.id)}/>)}
@@ -126,7 +127,7 @@ function App(){
    <Group justify="space-between" mb="lg" align="center"><Box><Text className="fieldwork-kicker">ENGINEERING WORKBENCH / {current.category.toUpperCase()}</Text><Text fw={700} size="xs" c="dimmed" mt="xs">Active project: {stackup.name}</Text></Box><Badge variant="dot" color="teal">Local workspace</Badge></Group>
    <div className="fieldwork-mobile-tabs" aria-label="Calculator navigation"><div>{workspaces.map(w=><button type="button" key={w.id} aria-pressed={active===w.id} onClick={()=>navigate(w.id)}>{w.title}</button>)}</div></div>
    {saveWarning&&<Alert color="yellow" mb="md">{saveWarning}</Alert>}
-   {active==="thermal"?<Calculator/>:active==="microstrip"?<ImpedanceSynthesis stackup={stackup}/>:active==="via"?<ViaWorkspace stackup={stackup}/>:<StackupWorkspace stackup={stackup} setStackup={setStackup}/>}
+   {active==="overview"?<ProjectOverview stackup={stackup} navigate={navigate}/>:active==="thermal"?<Calculator/>:active==="microstrip"?<ImpedanceSynthesis stackup={stackup}/>:active==="via"?<ViaWorkspace stackup={stackup}/>:<StackupWorkspace stackup={stackup} setStackup={setStackup}/>}
    <Group mt="xl" justify="space-between"><Text size="xs" c="dimmed">FIELDWORK PCB · Numerical results are model estimates.</Text><Text size="xs" c="dimmed">Sources and validity limits are shown within each workspace.</Text></Group>
   </Box></AppShell.Main>
  </AppShell>;
