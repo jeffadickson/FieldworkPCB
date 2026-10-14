@@ -1,5 +1,7 @@
-name: Publish web preview to GitHub Pages
+name: Publish FIELDWORK web preview
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 permissions:
   contents: read
@@ -11,6 +13,7 @@ concurrency:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -19,9 +22,18 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: npm install --no-audit --no-fund
-      - run: npm test
-      - run: npm run build -- --base=/FieldworkPCB/
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Check calculations
+        run: npm test
+      - name: Build public preview under repo base
+        run: npm run build -- --base=/FieldworkPCB/
+      - name: Check built entrypoint and assets
+        run: |
+          test -s dist/index.html
+          test -d dist/assets
+          grep -q '/FieldworkPCB/assets/' dist/index.html
+          touch dist/.nojekyll
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
