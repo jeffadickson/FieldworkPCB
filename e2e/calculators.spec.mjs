@@ -49,6 +49,7 @@ test('microstrip tracks the active stackup',async({page,isMobile})=>{
 test('invalid material curve is not committed',async({page,isMobile})=>{
  await page.goto('/');
  await navigate(page,'Stackup designer',isMobile);
+ await page.getByRole('button',{name:/Edit frequency-dependent material data/}).first().click();
  await expect(page.getByText('Material frequency samples').first()).toBeVisible();
  await page.getByRole('button',{name:'Apply curve'}).first().click();
  await expect(page.getByText('Source required').first()).toBeVisible();
