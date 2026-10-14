@@ -11,6 +11,8 @@ if(!wasmPath||!outputPath||!revision||!/^[0-9a-f]{40}$/i.test(revision))
 const binary=readFileSync(resolve(wasmPath));
 const {instance}=await WebAssembly.instantiate(binary);
 const e=instance.exports;
+const required=["tl_abi_version","tl_create","tl_destroy","tl_set_parameter","tl_analyse","tl_get_parameter"];
+for(const method of required)if(typeof e[method]!=="function")throw Error("Reference bridge missing "+method);
 if(e.tl_abi_version()!==1)throw Error("Unsupported external KiCad bridge ABI");
 const cases=[];
 const dimensions=[
@@ -29,7 +31,7 @@ for(const [i,d] of scenarios.entries()){
    [12,1],[13,1],[14,d.frequencyGHz*1e9],[23,5.8e7],[44,0],[45,1e9],
    [46,0],[47,0],[48,3.5],[49,.025]]);
   for(const [k,v] of entries)if(e.tl_set_parameter(h,k,v)!==1)throw Error("Set KiCad property "+k+" failed");
-  if(e.tl_analyse(h)!==1)throw Error("KiCad analysis failed on "+i);
+  if(e.tl_analyse(h)!==1)throw Error("KiCad analysis failed on "+i+" at "+d.frequencyGHz+" GHz");
   const z=e.tl_get_parameter(h,18);
   if(!Number.isFinite(z)||z<=0||z>1000)throw Error("KiCad impedance outside expected numeric domain");
   cases.push({id:"KICAD_WASM_MS_"+String(i+1).padStart(3,"0"),
