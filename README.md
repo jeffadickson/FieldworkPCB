@@ -107,3 +107,13 @@ Playwright smoke test navigation was adjusted for sidebar vs mobile tabs. **CI/V
 ## v0.32 — mobile project dashboard
 
 FIELDWORK now opens with a Project Overview instead of dropping directly into an arbitrary calculator. It reports the current stackup's copper count, thickness, dielectrics, visual layer arrangement, an illustrative top/bottom microstrip estimate when applicable, and shortcuts to four connected calculator workspaces. It reads the current locally stored board; no second copy of project data is created. New browser smoke tests cover dashboard navigation. These changes are committed, but production build and native-device verification remain pending.
+
+## Phone web preview (GitHub Pages)
+
+The [Pages preview workflow](https://github.com/jeffadickson/FieldworkPCB/actions/workflows/pages-preview.yml) now deploys automatically on commits to `main`, after `npm test` and a production build. It uses Vite's repository-specific base `/FieldworkPCB/` and uploads the compiled `dist/` assets with `.nojekyll`.
+
+Expected URL **once GitHub Pages is enabled and the deployment succeeds**: https://jeffadickson.github.io/FieldworkPCB/
+
+If the site is not available, repository admins should open **Settings → Pages → Build and deployment → Source: GitHub Actions**. The [workflow execution page](https://github.com/jeffadickson/FieldworkPCB/actions/workflows/pages-preview.yml) provides the exact build/deployment status and error logs. A successful public preview has not yet been verified in this environment. Do not assume a working URL merely from a committed workflow.
+
+Open the published URL in Safari on an iPhone to test the responsive UI. This is a web preview, not a signed iOS native app.
