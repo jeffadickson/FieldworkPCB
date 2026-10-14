@@ -1,6 +1,13 @@
 name: KiCad reference comparison (external GPL test tool)
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "tools/capture-kicad-wasm.mjs"
+      - "tools/compare-kicad.mjs"
+      - "tools/run-kicad-reference.mjs"
+      - ".github/workflows/kicad-reference.yml"
 permissions:
   contents: read
 jobs:
