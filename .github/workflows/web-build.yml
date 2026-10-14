@@ -10,6 +10,16 @@ concurrency:
   group: web-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  numerical-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Run all dependency-free numerical regression tests
+        run: npm test
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 30
