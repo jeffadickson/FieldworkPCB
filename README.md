@@ -103,3 +103,7 @@ A dedicated `numerical-only` GitHub Actions job runs dependency-free numerical r
 Introduces an original responsive engineering workbench visual language, with a graphite/navy technical sidebar, sea-glass/teal accents, generous calculation cards, strong result typography, phone-width workspace tabs and consistent headers across conductor thermal, microstrip, stackup and via workspaces. Advanced frequency sample editing is collapsed by default to reduce mobile clutter. The CSS is isolated in `src/fieldwork.css` and numerical models remain unchanged.
 
 Playwright smoke test navigation was adjusted for sidebar vs mobile tabs. **CI/Vite/Playwright execution remains unverified in this environment** because GitHub/npm DNS resolution is unavailable. A production-ready iOS release and migration of every historical calculator are still open tasks; see issues #1 and #3.
+
+## v0.32 — mobile project dashboard
+
+FIELDWORK now opens with a Project Overview instead of dropping directly into an arbitrary calculator. It reports the current stackup's copper count, thickness, dielectrics, visual layer arrangement, an illustrative top/bottom microstrip estimate when applicable, and shortcuts to four connected calculator workspaces. It reads the current locally stored board; no second copy of project data is created. New browser smoke tests cover dashboard navigation. These changes are committed, but production build and native-device verification remain pending.
