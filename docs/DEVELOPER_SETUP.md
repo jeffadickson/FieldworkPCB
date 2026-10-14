@@ -49,3 +49,7 @@ Node is installed using existing `apt-get`, `dnf` or `pacman` repositories when 
 | `make ios` | Build web and synchronize Capacitor iOS project (requires macOS for native builds) |
 
 **Important:** Android/iOS targets sync existing Capacitor projects; the actual Android Gradle/SDK and iOS Xcode setup is separate. Do not infer that a native build succeeded from a successful `make setup`. Browser setup installs Chromium only, not Apple's Simulator. No successful end-to-end setup has been verified yet.
+
+## v0.33 canonical tooling
+
+npm is the canonical package manager; Make is only a convenience wrapper. The repository pins Node 22 in `.node-version` and declares an npm version requirement in `package.json`. Use `npm run doctor` for host checks and `npm run doctor:release` to enforce the presence of an authentic dependency lockfile. The first lockfile must be generated with network access; GitHub Actions provides the manual `lockfile.yml` job for this. After downloading and committing it, the shared installer uses `npm ci` rather than `npm install`. See `docs/BUILD_MODERNIZATION_AUDIT.md` for all gates.
