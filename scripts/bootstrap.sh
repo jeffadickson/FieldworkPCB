@@ -14,14 +14,24 @@ install_node() {
     brew install node@22
     export PATH="$(brew --prefix node@22)/bin:$PATH"
   elif command -v apt-get >/dev/null 2>&1; then
-    echo "Install Node 22 via your distribution's supported repository or nvm. Automatic apt repositories may have older Node."
-    echo "See https://nodejs.org/en/download and rerun after installing."
-    exit 1
-  elif command -v dnf >/dev/null 2>&1 || command -v pacman >/dev/null 2>&1; then
-    echo "Install Node 22+ with your OS package manager or https://nodejs.org/en/download and rerun."
-    exit 1
+    echo "Attempting Debian/Ubuntu system packages (may not provide Node 22+)."
+    if command -v sudo >/dev/null 2>&1; then sudo apt-get update && sudo apt-get install -y nodejs npm
+    elif [ "$(id -u)" -eq 0 ]; then apt-get update && apt-get install -y nodejs npm
+    else echo "sudo or root is required for apt installation"; exit 1; fi
+  elif command -v dnf >/dev/null 2>&1; then
+    if command -v sudo >/dev/null 2>&1; then sudo dnf install -y nodejs npm
+    elif [ "$(id -u)" -eq 0 ]; then dnf install -y nodejs npm
+    else echo "sudo or root is required for dnf installation"; exit 1; fi
+  elif command -v pacman >/dev/null 2>&1; then
+    if command -v sudo >/dev/null 2>&1; then sudo pacman -S --needed --noconfirm nodejs npm
+    elif [ "$(id -u)" -eq 0 ]; then pacman -S --needed --noconfirm nodejs npm
+    else echo "sudo or root is required for pacman installation"; exit 1; fi
   else
     echo "Install Node 22+ from https://nodejs.org/en/download and rerun."
+    exit 1
+  fi
+  if ! command -v node >/dev/null 2>&1 || ! command -v npm >/dev/null 2>&1 || [ "$(node -p 'process.versions.node.split(".")[0]')" -lt 22 ]; then
+    echo "System packages did not provide Node 22+. Install a current Node LTS via https://nodejs.org/en/download (or an approved version manager), then rerun."
     exit 1
   fi
 }
