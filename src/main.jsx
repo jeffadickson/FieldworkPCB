@@ -1,3 +1,4 @@
+import {conductorLoss} from "./models/conductor-loss.mjs";
 import {microstripDielectricLoss} from "./models/dielectric-loss.mjs";
 import {interpolateDielectric} from "./models/material-dispersion.mjs";
 import {StackupWorkspace,ViaWorkspace} from "./BoardWorkspaces.jsx";
@@ -38,14 +39,15 @@ function Calculator(){
 
 function ImpedanceSynthesis({stackup}){
  const [target,setTarget]=useState(50),[h,setH]=useState(0.18),[t,setT]=useState(35),[er,setEr]=useState(4.2),[width,setWidth]=useState(0.35);
- const [stackupSide,setStackupSide]=useState("manual");const [freqGHz,setFreqGHz]=useState(1);const [lengthMm,setLengthMm]=useState(100);const [manualDf,setManualDf]=useState(0.02);
+ const [stackupSide,setStackupSide]=useState("manual");const [freqGHz,setFreqGHz]=useState(1);const [lengthMm,setLengthMm]=useState(100);const [manualDf,setManualDf]=useState(0.02);const [rho,setRho]=useState(1.724e-8);
  let linked=null,linkedError=null;
  if(stackupSide!=="manual"){try{linked=surfaceMicrostripGeometry(stackup,stackupSide,freqGHz)}catch(e){linkedError=e.message}}
  const params=linked??{heightMm:Number(h),thicknessUm:Number(t),er:Number(er)};
- let analysis,synthesis,error,loss,lossNote;
+ let analysis,synthesis,error,loss,lossNote,copperLoss;
  try{
    if(linkedError) throw new Error(linkedError);
    analysis=microstrip({widthMm:Number(width),...params});
+   copperLoss=conductorLoss({frequencyGHz:Number(freqGHz),widthMm:Number(width),heightMm:params.heightMm,impedanceOhms:analysis.impedanceOhms,lengthMm:Number(lengthMm),rho:Number(rho),thicknessUm:params.thicknessUm});
    synthesis=synthesizeMicrostrip({targetOhms:Number(target),...params});
    const seq=stackupSide==="bottom"?[...stackup.layers].reverse():stackup.layers;
    const layer=stackupSide==="manual"?null:seq[1];
@@ -67,6 +69,7 @@ function ImpedanceSynthesis({stackup}){
  <NumberInput label="Reference plane distance" value={params.heightMm} onChange={setH} suffix=" mm" min={0.001} disabled={!!linked}/>
  <NumberInput label="Copper thickness" value={params.thicknessUm} onChange={setT} suffix=" µm" min={0} disabled={!!linked}/>
  <NumberInput label="Relative permittivity (Dk)" value={params.er} onChange={setEr} min={1} decimalScale={3} disabled={!!linked}/>
+ <NumberInput label="Copper resistivity (Ω·m)" value={rho} onChange={setRho} min={1e-10} step={1e-9} precision={12}/>
  <NumberInput label="Trace length" suffix=" mm" value={lengthMm} min={0} onChange={setLengthMm}/>
  {stackupSide==="manual"&&<NumberInput label="Dissipation factor (Df)" value={manualDf} min={0} max={0.2} decimalScale={5} onChange={setManualDf}/>}
  <NumberInput label="Target impedance" value={target} onChange={setTarget} suffix=" Ω" min={1}/>
@@ -87,6 +90,7 @@ function ImpedanceSynthesis({stackup}){
  <Text size="sm" mt="sm" c="dimmed">Width for {Number(target).toFixed(1)} Ω</Text>
  <Title order={2}>{synthesis.widthMm.toFixed(4)} mm</Title>
  <Text size="xs" c="dimmed">Achieved: {synthesis.achievedOhms.toFixed(4)} Ω; constrained to 0.025–10 mm width</Text>
+ {copperLoss&&<><Text size="sm" mt="sm" c="dimmed">Preliminary conductor attenuation</Text><Title order={3}>{copperLoss.totalDb.toFixed(4)} dB</Title><Text size="xs">Skin depth {copperLoss.skinDepthUm.toFixed(3)} µm · {copperLoss.dbPerMeter.toFixed(3)} dB/m</Text>{!copperLoss.thickEnough&&<Text size="xs" c="red">Copper thickness below 3 skin depths; high-frequency approximation unreliable</Text>}</>}
  {loss?<><Text size="sm" mt="sm" c="dimmed">Approximate dielectric attenuation</Text><Title order={3}>{loss.totalDb.toFixed(4)} dB</Title><Text size="xs">{loss.dbPerMeter.toFixed(3)} dB/m · excludes copper, roughness, radiation and mismatch</Text></>:<Text size="xs" c="dimmed">{lossNote}</Text>}
  </>}</Paper>
  </Stack></SimpleGrid>
@@ -98,5 +102,5 @@ function ImpedanceSynthesis({stackup}){
 function getSafeStorage(){try{return typeof window==="undefined"?null:window.localStorage}catch{return null}}
 function App(){const [open,setOpen]=useState(false);const [active,setActive]=useState("thermal");const [stackup,setStackup]=useState(()=>loadLocalStackup(getSafeStorage()).stackup);
 const [saveWarning,setSaveWarning]=useState("");
-useEffect(()=>{const result=saveLocalStackup(getSafeStorage(),stackup);setSaveWarning(result.error??"");},[stackup]);return <AppShell header={{height:64}} navbar={{width:240,breakpoint:"sm",collapsed:{mobile:!open}}} padding="lg"><AppShell.Header><Group h="100%" px="lg" justify="space-between"><Group><Burger aria-label="Toggle navigation" opened={open} onClick={()=>setOpen(!open)} hiddenFrom="sm" size="sm"/><Box bg="teal" c="white" fw={900} px="sm" py={5} style={{borderRadius:8}}>F</Box><div><Text fw={800} lh="xs">FIELDWORK PCB</Text><Text size="xs" c="dimmed">ENGINEERING STUDIO</Text></div></Group><Badge variant="light" color="teal">v0.21</Badge></Group></AppShell.Header><AppShell.Navbar p="md" style={{background:"#102b33",color:"white"}}><Text fw={700} size="xs" c="gray.4">WORKSPACES</Text><NavLink mt="sm" active={active==="thermal"} label="Conductor thermal" onClick={()=>{setActive("thermal");setOpen(false);}}/><NavLink active={active==="microstrip"} label="Microstrip design" onClick={()=>{setActive("microstrip");setOpen(false);}}/><NavLink active={active==="via"} label="Via parameters" onClick={()=>{setActive("via");setOpen(false);}}/><NavLink active={active==="stackup"} label="Stackup designer" onClick={()=>{setActive("stackup");setOpen(false);}}/><Text size="xs" mt="xl" c="gray.4">Remaining calculators will migrate after parity testing. Existing standalone app is distributed in the v0.14 package.</Text></AppShell.Navbar><AppShell.Main><Box maw={1150} mx="auto">{saveWarning&&<Alert color="yellow" mb="md">{saveWarning}</Alert>}{active==="thermal"?<Calculator/>:active==="microstrip"?<ImpedanceSynthesis stackup={stackup}/>:active==="via"?<ViaWorkspace stackup={stackup}/>:<StackupWorkspace stackup={stackup} setStackup={setStackup}/>}</Box></AppShell.Main></AppShell>}
+useEffect(()=>{const result=saveLocalStackup(getSafeStorage(),stackup);setSaveWarning(result.error??"");},[stackup]);return <AppShell header={{height:64}} navbar={{width:240,breakpoint:"sm",collapsed:{mobile:!open}}} padding="lg"><AppShell.Header><Group h="100%" px="lg" justify="space-between"><Group><Burger aria-label="Toggle navigation" opened={open} onClick={()=>setOpen(!open)} hiddenFrom="sm" size="sm"/><Box bg="teal" c="white" fw={900} px="sm" py={5} style={{borderRadius:8}}>F</Box><div><Text fw={800} lh="xs">FIELDWORK PCB</Text><Text size="xs" c="dimmed">ENGINEERING STUDIO</Text></div></Group><Badge variant="light" color="teal">v0.22</Badge></Group></AppShell.Header><AppShell.Navbar p="md" style={{background:"#102b33",color:"white"}}><Text fw={700} size="xs" c="gray.4">WORKSPACES</Text><NavLink mt="sm" active={active==="thermal"} label="Conductor thermal" onClick={()=>{setActive("thermal");setOpen(false);}}/><NavLink active={active==="microstrip"} label="Microstrip design" onClick={()=>{setActive("microstrip");setOpen(false);}}/><NavLink active={active==="via"} label="Via parameters" onClick={()=>{setActive("via");setOpen(false);}}/><NavLink active={active==="stackup"} label="Stackup designer" onClick={()=>{setActive("stackup");setOpen(false);}}/><Text size="xs" mt="xl" c="gray.4">Remaining calculators will migrate after parity testing. Existing standalone app is distributed in the v0.14 package.</Text></AppShell.Navbar><AppShell.Main><Box maw={1150} mx="auto">{saveWarning&&<Alert color="yellow" mb="md">{saveWarning}</Alert>}{active==="thermal"?<Calculator/>:active==="microstrip"?<ImpedanceSynthesis stackup={stackup}/>:active==="via"?<ViaWorkspace stackup={stackup}/>:<StackupWorkspace stackup={stackup} setStackup={setStackup}/>}</Box></AppShell.Main></AppShell>}
 createRoot(document.getElementById("root")).render(<MantineProvider theme={{primaryColor:"teal",defaultRadius:"md"}}><App/></MantineProvider>);
