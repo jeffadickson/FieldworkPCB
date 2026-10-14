@@ -65,3 +65,9 @@ Important qualifications:
 - High-frequency dispersion, conductor conductivity, dielectric loss, and other setup differences can legitimately produce disagreement.
 - The job is **manual and unverified until its first GitHub Actions execution**.
 - Actual captures are written to GitHub Actions artifacts, not committed as fabricated source data.
+
+## v0.27 diagnostic artifacts
+
+The manual workflow now hashes the exact external WASM binary and stores that SHA-256 beside the source revision in `reference-results/`. After capture, `tools/run-kicad-reference.mjs` writes `comparison.log` and `summary.json` showing the comparator exit code, counts and differences. Files are uploaded even if the comparison fails. Exit 0 means the current numeric tolerances passed; exit 1 means at least one mismatch or invalid case, and exit 2 means no supported comparisons or input/infrastructure failure. These categories must be reviewed, not interpreted automatically as physical model quality.
+
+The workflow does not run on every push to avoid unnecessary dependence on a third-party GPL test engine; use the Actions manual trigger. Its first green run remains **unconfirmed**.
