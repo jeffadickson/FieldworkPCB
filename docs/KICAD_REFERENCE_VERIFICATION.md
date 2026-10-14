@@ -79,3 +79,11 @@ The external calculator capture now uses **four geometries × three frequencies 
 This is a valuable diagnostic: FIELDWORK uses a quasi-static impedance model, while KiCad's reference engine may include dispersion. Differences that grow with frequency must be investigated rather than loosening tolerances. A failed CI comparison may be the correct engineering result.
 
 The workflow is still manually triggered; no successful run or quantitative agreement should be claimed without the uploaded vector artifact.
+
+## v0.29: automatic integration validation
+
+The pinned KiCad comparison workflow now also runs on pushes that modify the reference capture/comparison scripts or the workflow itself. This enables GitHub's hosted runner to exercise the *actual external binary* without needing a separate manual dispatch. It does **not** run for unrelated app changes. Manual runs remain available.
+
+The capture script checks for required WebAssembly ABI functions and includes the frequency in analysis-error messages. Diagnostics and captured vectors are retained as workflow artifacts on failure.
+
+**Caution:** The code and trigger have been committed, but the CI result must be read from GitHub Actions before marking the comparison as passing. The 10 GHz cases may legitimately disagree with FIELDWORK's quasi-static model.
