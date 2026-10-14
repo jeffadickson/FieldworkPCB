@@ -19,17 +19,21 @@ jobs:
           ref: 79aab13534fd7f3dfecccbbbf8e33a04868bfc76
           path: external-kicad
           persist-credentials: false
-      - name: Capture actual external calculator outputs
+      - name: Record reference engine metadata
         run: |
           mkdir -p reference-results
-          node tools/capture-kicad-wasm.mjs external-kicad/dist/kicad-transline.wasm reference-results/kicad-vectors.json 79aab13534fd7f3dfecccbbbf8e33a04868bfc76
+          printf '%s\n' 'external_repository=ShinePCB/calculation' 'external_revision=79aab13534fd7f3dfecccbbbf8e33a04868bfc76' 'calculator_implementation=KiCad-derived WebAssembly' > reference-results/provenance.txt
+          test -s external-kicad/dist/kicad-transline.wasm
+          sha256sum external-kicad/dist/kicad-transline.wasm > reference-results/wasm-sha256.txt
+      - name: Capture actual external calculator outputs
+        run: node tools/capture-kicad-wasm.mjs external-kicad/dist/kicad-transline.wasm reference-results/kicad-vectors.json 79aab13534fd7f3dfecccbbbf8e33a04868bfc76
       - name: Compare independent FIELDWORK analytical model
-        run: node tools/compare-kicad.mjs reference-results/kicad-vectors.json
+        run: node tools/run-kicad-reference.mjs reference-results/kicad-vectors.json
       - name: Retain external comparison vectors and logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: kicad-external-reference-results
           path: reference-results/
-          if-no-files-found: warn
+          if-no-files-found: error
           retention-days: 30
