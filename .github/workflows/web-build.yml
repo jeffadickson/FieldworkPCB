@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version-file: .node-version
       - name: Run all dependency-free numerical regression tests
         run: npm test
   verify:
@@ -27,11 +27,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version-file: .node-version
       # Until the lockfile is committed, install and retain the resolved lockfile.
       # After committing it, switch this to npm ci.
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: node scripts/install-deps.mjs
       - name: Numerical regression tests
         run: npm test
       - name: Build production web app
