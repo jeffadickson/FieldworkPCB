@@ -3,8 +3,9 @@ const navigate=async(page,label,isMobile)=>{
  if(isMobile) await page.locator('.fieldwork-mobile-tabs').getByRole('button',{name:label}).click();
  else await page.locator('.fieldwork-nav').getByText(label,{exact:true}).click();
 };
-test('thermal calculator shows a finite result and source', async ({page}) => {
+test('thermal calculator shows a finite result and source', async ({page,isMobile}) => {
   await page.goto('/');
+  await navigate(page,'Conductor thermal',isMobile);
   await expect(page.getByRole('heading', {name: 'Conductor thermal'})).toBeVisible();
   await expect(page.getByText('Estimated temperature rise')).toBeVisible();
   await expect(page.getByRole('link', {name: /Trace Currents and Temperatures Revisited/i})).toBeVisible();
@@ -53,4 +54,12 @@ test('invalid material curve is not committed',async({page,isMobile})=>{
  await expect(page.getByText('Material frequency samples').first()).toBeVisible();
  await page.getByRole('button',{name:'Apply curve'}).first().click();
  await expect(page.getByText('Source required').first()).toBeVisible();
+});
+
+test('project dashboard and calculator shortcut',async({page})=>{
+ await page.goto('/');
+ await expect(page.getByRole('heading',{name:'Four-layer example'})).toBeVisible();
+ await expect(page.getByText('Board at a glance')).toBeVisible();
+ await page.getByRole('button',{name:'Open calculator'}).first().click();
+ await expect(page.getByRole('heading',{name:'Stackup designer'})).toBeVisible();
 });
