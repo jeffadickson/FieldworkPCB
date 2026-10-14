@@ -1,0 +1,16 @@
+node_modules/
+dist/
+build/
+coverage/
+playwright-report/
+test-results/
+preview-evidence/
+reference-results/
+android/.gradle/
+android/local.properties
+ios/Pods/
+*.log
+.DS_Store
+.env
+.env.*
+!.env.example
