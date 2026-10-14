@@ -15,3 +15,6 @@ export function saveLocalStackup(storage,stackup){
  try{storage.setItem(PROJECT_STORAGE_KEY,json);return {ok:true,error:null}}
  catch(e){return {ok:false,error:"Local storage failed; export your stackup as JSON."}}
 }
+
+/** On recovery failure, keep stored bytes intact until the user actually edits. */
+export function shouldAutoSave(initialWarning,hasUserEdited){return !initialWarning||hasUserEdited;}
