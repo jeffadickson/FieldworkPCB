@@ -117,3 +117,7 @@ Expected URL **once GitHub Pages is enabled and the deployment succeeds**: https
 If the site is not available, repository admins should open **Settings → Pages → Build and deployment → Source: GitHub Actions**. The [workflow execution page](https://github.com/jeffadickson/FieldworkPCB/actions/workflows/pages-preview.yml) provides the exact build/deployment status and error logs. A successful public preview has not yet been verified in this environment. Do not assume a working URL merely from a committed workflow.
 
 Open the published URL in Safari on an iPhone to test the responsive UI. This is a web preview, not a signed iOS native app.
+
+## Preview smoke checks
+
+The Pages deployment now validates the built React app at the actual `/FieldworkPCB/` URL before publishing. It starts Vite preview, uses Playwright Chromium to load both 1440px desktop and 390px iPhone-sized viewports, checks the project overview renders without JavaScript page errors, and saves `desktop.png` and `iphone.png` in a `fieldwork-preview-screenshots` Actions artifact (including on failures when generated). A failure prevents deployment of that revision. This does **not** establish that GitHub Pages is enabled or that a successful deployment has occurred.
