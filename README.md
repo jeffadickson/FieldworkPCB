@@ -1,6 +1,6 @@
 # FIELDWORK PCB
 
-A modern, reference-backed PCB engineering workbench. **v0.21 development snapshot on main:** React + Mantine, Brooks–Adam conductor heating, and Hammerstad–Jensen microstrip impedance synthesis.
+A modern, reference-backed PCB engineering workbench. **v0.22 development snapshot on main:** React + Mantine, Brooks–Adam conductor heating, and Hammerstad–Jensen microstrip impedance synthesis.
 
 ## Run the new web application
 
@@ -63,3 +63,7 @@ Each dielectric layer in Stackup Designer now exposes an editor for source-attri
 ## v0.21 dielectric attenuation
 
 Microstrip Design now supports an explicitly labeled quasi-TEM **dielectric-only** loss estimate for a specified frequency and trace length. The active stackup must supply a source-attributed Df curve to enable automatic attenuation; manual-entry mode permits an explicit assumed Df. The computed result excludes copper, surface roughness, soldermask, mismatch, and radiation losses. See `docs/DIELECTRIC_LOSS_REFERENCE.md` and [issue #4](https://github.com/jeffadickson/FieldworkPCB/issues/4). Numerical tests are committed; current GitHub Actions pass status has not been confirmed.
+
+## v0.22 — conductor loss (preliminary)
+
+The microstrip workspace now reports copper skin depth and separate approximate conductor attenuation from resistivity, frequency, trace width, dielectric height, and calculated Z0. Dielectric loss is reported separately; there is **no claim that adding the two approximations produces qualified S21 insertion loss**. The conductor-loss geometric factor is deliberately a rough sheet-current heuristic, not full-wave analysis or a Wheeler/Hammerstad loss model. See `docs/CONDUCTOR_LOSS_REFERENCE.md`, [issue #7](https://github.com/jeffadickson/FieldworkPCB/issues/7), and the new scaling/invalid-input tests. Successful CI build verification remains outstanding.
