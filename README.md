@@ -85,3 +85,7 @@ A manually triggered GitHub workflow now checks out a pinned third-party KiCad C
 - [Tracked validation work](../../issues/10)
 
 **The workflow has not yet been executed and its numerical agreement is unverified.** The comparison is a reference cross-check, not electromagnetic accuracy certification.
+
+## v0.27 — Reference-test diagnostics
+
+The manual KiCad-derived WASM comparison workflow now writes an external binary SHA-256 checksum, reference revision, numerical captures, `comparison.log`, and `summary.json` as GitHub Actions artifacts. These diagnostics survive comparison failures. A real green run remains unverified. This infrastructure does not add GPL source to FIELDWORK's distributed app.
