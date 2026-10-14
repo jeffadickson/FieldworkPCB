@@ -89,3 +89,7 @@ A manually triggered GitHub workflow now checks out a pinned third-party KiCad C
 ## v0.27 — Reference-test diagnostics
 
 The manual KiCad-derived WASM comparison workflow now writes an external binary SHA-256 checksum, reference revision, numerical captures, `comparison.log`, and `summary.json` as GitHub Actions artifacts. These diagnostics survive comparison failures. A real green run remains unverified. This infrastructure does not add GPL source to FIELDWORK's distributed app.
+
+## v0.28 frequency sweep
+
+The external KiCad-derived reference capture now records 12 real-calculation **candidate** cases: four microstrip geometries at 0.1, 1 and 10 GHz. The workflow still requires a manual GitHub Actions run. Frequency dependence provides a diagnostic for KiCad dispersion versus FIELDWORK's quasi-static model; disagreements will be reviewed, not masked. See `docs/KICAD_REFERENCE_VERIFICATION.md` and issue #10. No live CI comparison outcome is asserted.
