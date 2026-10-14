@@ -10,12 +10,12 @@ function downloadJson(text,filename){
  a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
 }
 export function StackupWorkspace({stackup,setStackup}){
- const [error,setError]=useState("");
+ const [error,setError]=useState("");const [editingMaterial,setEditingMaterial]=useState(null);
  let summary;try{summary=validateStackup(stackup)}catch(e){error ||=e.message}
  const updateLayer=(index,props)=>{setError("");setStackup(prev=>({...prev,layers:prev.layers.map((l,i)=>i===index?{...l,...props}:l)}));};
  const load=(s)=>{try{setStackup(parseStackup(s));setError("")}catch(e){setError(e.message)}};
  return <Stack>
- <Group justify="space-between"><div><Title order={2}>Stackup designer</Title><Text size="sm" c="dimmed">Layer-by-layer design with local JSON save/load</Text></div><Badge color="teal">Offline files</Badge></Group>
+ <div className="fieldwork-hero"><Text size="xs" fw={800} tt="uppercase" style={{letterSpacing:".15em",color:"#9ad6d2"}}>Board construction · Materials</Text><Title order={2}>Stackup designer</Title><Text>One shared board geometry for every engineering calculator.</Text><Badge color="cyan" variant="light" mt="sm">Local JSON · Versioned</Badge></div>
  {error&&<Alert color="red">{error}</Alert>}
  <TextInput label="Board name" value={stackup.name} onChange={e=>setStackup({...stackup,name:e.currentTarget.value})}/>
  <Paper withBorder p="md"><Group justify="space-between"><Text fw={700}>Cross-section</Text><Text>{summary?.totalMm.toFixed(3)??"—"} mm total</Text></Group>
@@ -29,7 +29,7 @@ export function StackupWorkspace({stackup,setStackup}){
  <Select label="Material" value={l.material} data={[...Object.keys(MATERIALS)]} onChange={v=>updateLayer(i,{material:v,er:MATERIALS[v]?.er??l.er})}/>
  <NumberInput label="Relative Dk" value={l.er} min={1} max={30} onChange={v=>updateLayer(i,{er:v})}/>
  </>}</SimpleGrid>
- {l.type==="dielectric"&&<DielectricCurveEditor key={l.id+JSON.stringify(l.dielectricCurve??null)} curve={l.dielectricCurve} onSave={data=>updateLayer(i,{dielectricCurve:data})} onRemove={()=>{setStackup(prev=>({...prev,layers:prev.layers.map((old,j)=>{if(j!==i)return old;const {dielectricCurve,...rest}=old;return rest;})}));setError("");}}/>}
+ {l.type==="dielectric"&&<><Button mt="sm" variant="light" size="xs" onClick={()=>setEditingMaterial(editingMaterial===l.id?null:l.id)}>{editingMaterial===l.id?"Hide":"Edit"} frequency-dependent material data {l.dielectricCurve?"· configured":""}</Button>{editingMaterial===l.id&&<DielectricCurveEditor key={l.id+JSON.stringify(l.dielectricCurve??null)} curve={l.dielectricCurve} onSave={data=>{updateLayer(i,{dielectricCurve:data});setEditingMaterial(null);}} onRemove={()=>{setStackup(prev=>({...prev,layers:prev.layers.map((old,j)=>{if(j!==i)return old;const {dielectricCurve,...rest}=old;return rest;})}));setError("");setEditingMaterial(null);}}/>}</>}
  </Paper>)}</Stack>
  <Group><Button variant="light" onClick={()=>{try{setStackup(addInnerPair(stackup));setError("")}catch(e){setError(e.message)}}}>Add inner copper layer</Button>
  <Button variant="default" onClick={()=>setStackup(starterStackup())}>Reset example</Button></Group>
@@ -43,7 +43,7 @@ export function ViaWorkspace({stackup}){
  let result,error,actual=board;
  try{if(useBoard)actual=validateStackup(stackup).totalMm;result=viaDC({boardMm:actual,holeMm:Number(hole),platingUm:Number(plating),currentA:Number(current),temperatureC:Number(temp)});}catch(e){error=e.message}
  return <Stack>
- <Group justify="space-between"><div><Title order={2}>Via parameters</Title><Text size="sm" c="dimmed">Plated barrel DC resistance and power</Text></div><Badge color="orange">First-order</Badge></Group>
+ <div className="fieldwork-hero"><Text size="xs" fw={800} tt="uppercase" style={{letterSpacing:".15em",color:"#9ad6d2"}}>Interconnects · Plated holes</Text><Title order={2}>Via parameters</Title><Text>Explore barrel geometry, copper resistance, voltage drop and power.</Text><Badge color="yellow" variant="light" mt="sm">First-order electrical model</Badge></div>
  <SimpleGrid cols={{base:1,md:2}}><Paper withBorder p="lg"><Stack>
  <Button variant={useBoard?"filled":"outline"} onClick={()=>setUseBoard(!useBoard)}>{useBoard?"Using saved stackup":"Use active stackup"}</Button>
  <NumberInput label="Board thickness" suffix=" mm" value={actual} onChange={setBoard} disabled={useBoard} min={.001}/>
