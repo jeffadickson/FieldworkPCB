@@ -75,3 +75,13 @@ Official KiCad PCB Calculator sources and documentation can now be treated as in
 ## v0.25 — KiCad comparison guardrails
 
 The reference comparator now rejects fake/synthetic capture metadata by default, requires frequency/version/method provenance, disallows duplicate IDs and invalid tolerance values, and fails when all requested models are skipped. Its self-tests use explicit `--allow-synthetic` (results report `verified:false`). See `docs/KICAD_REFERENCE_VERIFICATION.md` and [issue #10](https://github.com/jeffadickson/FieldworkPCB/issues/10). Actual KiCad captured outputs and a verified green CI run remain outstanding.
+
+## v0.26 — pinned KiCad-derived automated references
+
+A manually triggered GitHub workflow now checks out a pinned third-party KiCad C++ WebAssembly port in the **test job only** and captures **actual numerical microstrip results**. The captured vector file is then compared with FIELDWORK and uploaded as a build artifact. This is not a synthetic comparator self-test, and the external GPL components are not linked into or distributed with the FIELDWORK application. The source is a KiCad-derived **third-party port**, not the official KiCad GUI.
+
+- [Run the comparison workflow](../../actions/workflows/kicad-reference.yml)
+- [Reference and licensing notes](docs/KICAD_REFERENCE_VERIFICATION.md)
+- [Tracked validation work](../../issues/10)
+
+**The workflow has not yet been executed and its numerical agreement is unverified.** The comparison is a reference cross-check, not electromagnetic accuracy certification.
