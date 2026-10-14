@@ -71,3 +71,11 @@ Important qualifications:
 The manual workflow now hashes the exact external WASM binary and stores that SHA-256 beside the source revision in `reference-results/`. After capture, `tools/run-kicad-reference.mjs` writes `comparison.log` and `summary.json` showing the comparator exit code, counts and differences. Files are uploaded even if the comparison fails. Exit 0 means the current numeric tolerances passed; exit 1 means at least one mismatch or invalid case, and exit 2 means no supported comparisons or input/infrastructure failure. These categories must be reviewed, not interpreted automatically as physical model quality.
 
 The workflow does not run on every push to avoid unnecessary dependence on a third-party GPL test engine; use the Actions manual trigger. Its first green run remains **unconfirmed**.
+
+## v0.28: frequency sweep
+
+The external calculator capture now uses **four geometries × three frequencies (0.1, 1, 10 GHz) = 12 cases**. Each observation stores its *actual* reference frequency rather than a fixed value, and the geometry inputs passed to FIELDWORK remain limited to the required dimensions.
+
+This is a valuable diagnostic: FIELDWORK uses a quasi-static impedance model, while KiCad's reference engine may include dispersion. Differences that grow with frequency must be investigated rather than loosening tolerances. A failed CI comparison may be the correct engineering result.
+
+The workflow is still manually triggered; no successful run or quantitative agreement should be claimed without the uploaded vector artifact.
