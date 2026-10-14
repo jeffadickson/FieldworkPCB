@@ -17,8 +17,8 @@ endif
 
 help:
 	@echo FIELDWORK PCB developer targets
-	@echo "make setup      Install/check Node 22, npm dependencies and Playwright Chromium"
-	@echo "make doctor     Check platform development prerequisites"
+	@echo "make setup      Bootstrap Node, npm dependencies and Playwright Chromium"
+	@echo "make doctor     Check host and release readiness"
 	@echo "make install    Install npm dependencies (requires Node/npm)"
 	@echo "make browsers   Install Playwright Chromium"
 	@echo "make dev        Run Vite development server"
@@ -31,11 +31,8 @@ help:
 	@echo "make clean      Remove generated web build"
 
 doctor:
-ifeq ($(OS),Windows_NT)
-	$(BOOTSTRAP) -Doctor
-else
-	$(BOOTSTRAP) --doctor
-endif
+	$(BOOTSTRAP) $(if $(filter Windows_NT,$(OS)),-Doctor,--doctor)
+	$(NPM) run doctor
 
 setup:
 	$(BOOTSTRAP)
@@ -70,12 +67,10 @@ preview:
 	$(NPM) run preview
 
 android:
-	$(NPM) run build
-	$(NPX) cap sync android
+	$(NPM) run build:android
 
 ios:
-	$(NPM) run build
-	$(NPX) cap sync ios
+	$(NPM) run build:ios
 
 clean:
 	$(CLEAN)
