@@ -1,3 +1,4 @@
+import {DielectricCurveEditor} from "./DielectricCurveEditor.jsx";
 import React,{useRef,useState} from "react";
 import {Alert,Badge,Button,FileButton,Group,NumberInput,Paper,Select,SimpleGrid,Stack,Text,TextInput,Title} from "@mantine/core";
 import {starterStackup,validateStackup,serializeStackup,parseStackup,addInnerPair,MATERIALS} from "./models/stackup.mjs";
@@ -28,6 +29,7 @@ export function StackupWorkspace({stackup,setStackup}){
  <Select label="Material" value={l.material} data={[...Object.keys(MATERIALS)]} onChange={v=>updateLayer(i,{material:v,er:MATERIALS[v]?.er??l.er})}/>
  <NumberInput label="Relative Dk" value={l.er} min={1} max={30} onChange={v=>updateLayer(i,{er:v})}/>
  </>}</SimpleGrid>
+ {l.type==="dielectric"&&<DielectricCurveEditor key={l.id+JSON.stringify(l.dielectricCurve??null)} curve={l.dielectricCurve} onSave={data=>updateLayer(i,{dielectricCurve:data})} onRemove={()=>{setStackup(prev=>({...prev,layers:prev.layers.map((old,j)=>{if(j!==i)return old;const {dielectricCurve,...rest}=old;return rest;})}));setError("");}}/>}
  </Paper>)}</Stack>
  <Group><Button variant="light" onClick={()=>{try{setStackup(addInnerPair(stackup));setError("")}catch(e){setError(e.message)}}}>Add inner copper layer</Button>
  <Button variant="default" onClick={()=>setStackup(starterStackup())}>Reset example</Button></Group>
