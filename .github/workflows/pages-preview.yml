@@ -21,9 +21,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version-file: .node-version
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: node scripts/install-deps.mjs
       - name: Check calculations
         run: npm test
       - name: Build public preview under repo base
