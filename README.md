@@ -1,6 +1,6 @@
 # FIELDWORK PCB
 
-A modern, reference-backed PCB engineering workbench. **v0.20 development snapshot on main:** React + Mantine, Brooks–Adam conductor heating, and Hammerstad–Jensen microstrip impedance synthesis.
+A modern, reference-backed PCB engineering workbench. **v0.21 development snapshot on main:** React + Mantine, Brooks–Adam conductor heating, and Hammerstad–Jensen microstrip impedance synthesis.
 
 ## Run the new web application
 
@@ -59,3 +59,7 @@ The standalone v0.5 stackup JSON schema and this new React schema have not been 
 ## v0.20 material editor
 
 Each dielectric layer in Stackup Designer now exposes an editor for source-attributed frequency (GHz), Dk and Df samples. Changes are only committed on valid Apply; any invalid intermediate edits remain drafts. JSON save/load and linked microstrip lookups preserve the optional curve. Starting sample numbers are illustrative, not sourced vendor specifications. Model validity and numerical accuracy require reference datasets and independent verification (GitHub issue #4). The updated CI run has not been independently confirmed successful.
+
+## v0.21 dielectric attenuation
+
+Microstrip Design now supports an explicitly labeled quasi-TEM **dielectric-only** loss estimate for a specified frequency and trace length. The active stackup must supply a source-attributed Df curve to enable automatic attenuation; manual-entry mode permits an explicit assumed Df. The computed result excludes copper, surface roughness, soldermask, mismatch, and radiation losses. See `docs/DIELECTRIC_LOSS_REFERENCE.md` and [issue #4](https://github.com/jeffadickson/FieldworkPCB/issues/4). Numerical tests are committed; current GitHub Actions pass status has not been confirmed.
