@@ -36,3 +36,16 @@ The comparison runner uses FIELDWORK's independent formulas and external numeric
 ## Verification limits and CI
 
 The comparison runner requires verified numerical captures. CI should not report a KiCad agreement rate until such cases exist. Ordinary numerical unit tests remain mandatory and separate; KiCad-derived vector CI becomes a distinct, optionally gated job once reference observations are documented and licensed appropriately.
+
+## Validation guardrails (v0.25)
+
+The comparison program **rejects synthetic, mock, placeholder, or `REPLACE_WITH` IDs and source metadata** by default. It requires a recorded reference frequency, KiCad version, calculator, capture method, and distinct case IDs. Numerical tolerances must be finite and nonnegative. A suite with zero supported comparisons fails with exit code 2 instead of reporting a misleading success.
+
+Only the comparator's **self-tests** use `--allow-synthetic`, which disables the synthetic-data provenance rejection and labels the final report `verified:false`; it must not be used for engineering acceptance or publication.
+
+```sh
+node tests/reference-harness.test.mjs
+node tools/compare-kicad.mjs fixtures/kicad-verified-vectors.json
+```
+
+The committed template is not a genuine KiCad capture and is expected to fail validation. Do not infer agreement from test harness self-tests.
