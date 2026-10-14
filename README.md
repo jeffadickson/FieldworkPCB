@@ -71,3 +71,7 @@ The microstrip workspace now reports copper skin depth and separate approximate 
 ## v0.24 — independent KiCad cross-check infrastructure
 
 Official KiCad PCB Calculator sources and documentation can now be treated as independent numerical references without embedding KiCad GPL code. `tools/compare-kicad.mjs` compares recorded microstrip impedance and width-synthesis values with FIELDWORK outputs. The vector template is at `fixtures/kicad-reference-template.json`, with instructions in `docs/KICAD_REFERENCE_VERIFICATION.md`. The self-tests verify comparator PASS/DIFF behavior with **synthetic** inputs; **no real KiCad reference vectors have been captured yet**. See [issue #10](https://github.com/jeffadickson/FieldworkPCB/issues/10). A successful GitHub build for this change has not been independently confirmed.
+
+## v0.25 — KiCad comparison guardrails
+
+The reference comparator now rejects fake/synthetic capture metadata by default, requires frequency/version/method provenance, disallows duplicate IDs and invalid tolerance values, and fails when all requested models are skipped. Its self-tests use explicit `--allow-synthetic` (results report `verified:false`). See `docs/KICAD_REFERENCE_VERIFICATION.md` and [issue #10](https://github.com/jeffadickson/FieldworkPCB/issues/10). Actual KiCad captured outputs and a verified green CI run remain outstanding.
