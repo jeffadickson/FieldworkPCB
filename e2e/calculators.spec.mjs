@@ -44,3 +44,12 @@ test('microstrip tracks the active stackup',async({page,isMobile})=>{
  await nav('Microstrip design');
  await expect(page.getByRole('heading',{name:'Microstrip design'})).toBeVisible();
 });
+
+test('invalid material curve is not committed',async({page,isMobile})=>{
+ await page.goto('/');
+ if(isMobile)await page.getByRole('button',{name:'Toggle navigation'}).click();
+ await page.getByText('Stackup designer',{exact:true}).last().click();
+ await expect(page.getByText('Material frequency samples').first()).toBeVisible();
+ await page.getByRole('button',{name:'Apply curve'}).first().click();
+ await expect(page.getByText('Source required').first()).toBeVisible();
+});
