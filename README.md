@@ -67,3 +67,7 @@ Microstrip Design now supports an explicitly labeled quasi-TEM **dielectric-only
 ## v0.22 — conductor loss (preliminary)
 
 The microstrip workspace now reports copper skin depth and separate approximate conductor attenuation from resistivity, frequency, trace width, dielectric height, and calculated Z0. Dielectric loss is reported separately; there is **no claim that adding the two approximations produces qualified S21 insertion loss**. The conductor-loss geometric factor is deliberately a rough sheet-current heuristic, not full-wave analysis or a Wheeler/Hammerstad loss model. See `docs/CONDUCTOR_LOSS_REFERENCE.md`, [issue #7](https://github.com/jeffadickson/FieldworkPCB/issues/7), and the new scaling/invalid-input tests. Successful CI build verification remains outstanding.
+
+## v0.24 — independent KiCad cross-check infrastructure
+
+Official KiCad PCB Calculator sources and documentation can now be treated as independent numerical references without embedding KiCad GPL code. `tools/compare-kicad.mjs` compares recorded microstrip impedance and width-synthesis values with FIELDWORK outputs. The vector template is at `fixtures/kicad-reference-template.json`, with instructions in `docs/KICAD_REFERENCE_VERIFICATION.md`. The self-tests verify comparator PASS/DIFF behavior with **synthetic** inputs; **no real KiCad reference vectors have been captured yet**. See [issue #10](https://github.com/jeffadickson/FieldworkPCB/issues/10). A successful GitHub build for this change has not been independently confirmed.
