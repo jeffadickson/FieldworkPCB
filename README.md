@@ -1,6 +1,6 @@
 # FIELDWORK PCB
 
-A modern, reference-backed PCB engineering workbench. **v0.17 development snapshot on main:** React + Mantine, Brooks–Adam conductor heating, and Hammerstad–Jensen microstrip impedance synthesis.
+A modern, reference-backed PCB engineering workbench. **v0.20 development snapshot on main:** React + Mantine, Brooks–Adam conductor heating, and Hammerstad–Jensen microstrip impedance synthesis.
 
 ## Run the new web application
 
@@ -55,3 +55,7 @@ This React stackup editor introduces a deliberately limited `fieldwork.stackup` 
 Microstrip analysis and target-width synthesis now accept geometry sourced from the active top or bottom signal layer. The adjacent dielectric supplies spacing and relative permittivity; the selected outer copper supplies finished thickness. Only configurations with a directly adjacent ground/power reference plane are accepted. Manual input remains available. Changes made in Stackup Designer propagate into the calculator while linked. This is the documented **single homogeneous dielectric / quasi-static microstrip** approximation, not a solver for inner-layer stripline or complex return-current environments.
 
 The standalone v0.5 stackup JSON schema and this new React schema have not been proven compatible. Existing saved designs must be migrated explicitly before claiming file compatibility. React build, E2E, and native artifacts remain subject to GitHub Actions execution.
+
+## v0.20 material editor
+
+Each dielectric layer in Stackup Designer now exposes an editor for source-attributed frequency (GHz), Dk and Df samples. Changes are only committed on valid Apply; any invalid intermediate edits remain drafts. JSON save/load and linked microstrip lookups preserve the optional curve. Starting sample numbers are illustrative, not sourced vendor specifications. Model validity and numerical accuracy require reference datasets and independent verification (GitHub issue #4). The updated CI run has not been independently confirmed successful.
