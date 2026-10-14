@@ -1,0 +1,22 @@
+name: Generate dependency lockfile
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  lockfile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+      - run: npm install --package-lock-only --ignore-scripts --no-fund
+      - run: npm ci --no-fund
+      - run: npm test
+      - run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fieldwork-package-lock
+          path: package-lock.json
+          if-no-files-found: error
