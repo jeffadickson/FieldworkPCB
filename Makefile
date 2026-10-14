@@ -31,16 +31,28 @@ help:
 	@echo "make clean      Remove generated web build"
 
 doctor:
+ifeq ($(OS),Windows_NT)
+	$(BOOTSTRAP) -Doctor
+else
 	$(BOOTSTRAP) --doctor
+endif
 
 setup:
 	$(BOOTSTRAP)
 
 install:
+ifeq ($(OS),Windows_NT)
+	$(BOOTSTRAP) -DepsOnly
+else
 	$(BOOTSTRAP) --deps-only
+endif
 
 browsers:
+ifeq ($(OS),Windows_NT)
+	$(BOOTSTRAP) -BrowsersOnly
+else
 	$(BOOTSTRAP) --browsers-only
+endif
 
 dev:
 	$(NPM) run dev
