@@ -1,0 +1,35 @@
+name: KiCad reference comparison (external GPL test tool)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Checkout pinned external KiCad-derived WebAssembly port
+        uses: actions/checkout@v4
+        with:
+          repository: ShinePCB/calculation
+          ref: 79aab13534fd7f3dfecccbbbf8e33a04868bfc76
+          path: external-kicad
+          persist-credentials: false
+      - name: Capture actual external calculator outputs
+        run: |
+          mkdir -p reference-results
+          node tools/capture-kicad-wasm.mjs external-kicad/dist/kicad-transline.wasm reference-results/kicad-vectors.json 79aab13534fd7f3dfecccbbbf8e33a04868bfc76
+      - name: Compare independent FIELDWORK analytical model
+        run: node tools/compare-kicad.mjs reference-results/kicad-vectors.json
+      - name: Retain external comparison vectors and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kicad-external-reference-results
+          path: reference-results/
+          if-no-files-found: warn
+          retention-days: 30
