@@ -121,3 +121,7 @@ Open the published URL in Safari on an iPhone to test the responsive UI. This is
 ## Preview smoke checks
 
 The Pages deployment now validates the built React app at the actual `/FieldworkPCB/` URL before publishing. It starts Vite preview, uses Playwright Chromium to load both 1440px desktop and 390px iPhone-sized viewports, checks the project overview renders without JavaScript page errors, and saves `desktop.png` and `iphone.png` in a `fieldwork-preview-screenshots` Actions artifact (including on failures when generated). A failure prevents deployment of that revision. This does **not** establish that GitHub Pages is enabled or that a successful deployment has occurred.
+
+## Automatic developer environment setup
+
+Run `make setup` on macOS/Linux or Windows with GNU Make installed. Without Make on Windows, run `powershell -ExecutionPolicy Bypass -File scripts/bootstrap.ps1`. The setup scripts check/install Node.js 22+, install npm dependencies, and fetch the Playwright Chromium browser; `make doctor`, `make test`, `make build`, `make dev`, `make preview`, `make android` and `make ios` are also available. See [cross-platform setup instructions](docs/DEVELOPER_SETUP.md). Linux distro repositories may need a newer Node.js source; iOS Xcode/Android SDK and signing remain separate prerequisites. Setup has not yet been verified end-to-end on all three operating systems.
