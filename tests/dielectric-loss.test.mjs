@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {microstripDielectricLoss} from '../src/models/dielectric-loss.mjs';
+const p={frequencyGHz:1,er:4.2,effectiveEr:3.1,lossTangent:.02,lengthMm:100};
+const a=microstripDielectricLoss(p);
+assert.ok(a.dbPerMeter>0&&a.totalDb>0);
+assert.ok(Math.abs(a.totalDb-a.dbPerMeter*.1)<1e-12);
+assert.ok(Math.abs(microstripDielectricLoss({...p,frequencyGHz:2}).totalDb-2*a.totalDb)<1e-12);
+assert.ok(Math.abs(microstripDielectricLoss({...p,lossTangent:0}).totalDb)<1e-12);
+assert.throws(()=>microstripDielectricLoss({...p,er:1}));
+assert.throws(()=>microstripDielectricLoss({...p,effectiveEr:5}));
+assert.throws(()=>microstripDielectricLoss({...p,lossTangent:-1}));
+console.log('Quasi-TEM dielectric loss boundary and scaling tests passed');
