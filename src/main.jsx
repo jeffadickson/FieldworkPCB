@@ -98,7 +98,6 @@ function ImpedanceSynthesis({stackup}){
  </Stack>
 }
 
-function getSafeStorage(){try{return typeof window==="undefined"?null:window.localStorage}catch{return null}}
 const workspaces=[{id:"thermal",title:"Conductor thermal",symbol:"◉",category:"Power & thermal"},{id:"microstrip",title:"Microstrip design",symbol:"≈",category:"Signal integrity"},{id:"via",title:"Via parameters",symbol:"◎",category:"Interconnects"},{id:"stackup",title:"Stackup designer",symbol:"▤",category:"Board construction"}];
 function getSafeStorage(){try{return typeof window==="undefined"?null:window.localStorage}catch{return null}}
 function App(){
