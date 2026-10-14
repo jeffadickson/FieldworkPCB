@@ -97,3 +97,9 @@ The external KiCad-derived reference capture now records 12 real-calculation **c
 ## v0.30 — CI triage improvements
 
 A dedicated `numerical-only` GitHub Actions job runs dependency-free numerical regressions independently of React dependency installation. The KiCad comparison workflow now summarizes pass/difference counts on the GitHub Actions run page in addition to saving detailed artifacts. These changes are committed but do not establish green CI, KiCad agreement, or physical-model validation. Track the remaining work in issues #1 and #10.
+
+## v0.31 — React visual overhaul
+
+Introduces an original responsive engineering workbench visual language, with a graphite/navy technical sidebar, sea-glass/teal accents, generous calculation cards, strong result typography, phone-width workspace tabs and consistent headers across conductor thermal, microstrip, stackup and via workspaces. Advanced frequency sample editing is collapsed by default to reduce mobile clutter. The CSS is isolated in `src/fieldwork.css` and numerical models remain unchanged.
+
+Playwright smoke test navigation was adjusted for sidebar vs mobile tabs. **CI/Vite/Playwright execution remains unverified in this environment** because GitHub/npm DNS resolution is unavailable. A production-ready iOS release and migration of every historical calculator are still open tasks; see issues #1 and #3.
