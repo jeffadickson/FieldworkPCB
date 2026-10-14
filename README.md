@@ -125,3 +125,9 @@ The Pages deployment now validates the built React app at the actual `/Fieldwork
 ## Automatic developer environment setup
 
 Run `make setup` on macOS/Linux or Windows with GNU Make installed. Without Make on Windows, run `powershell -ExecutionPolicy Bypass -File scripts/bootstrap.ps1`. The setup scripts check/install Node.js 22+, install npm dependencies, and fetch the Playwright Chromium browser; `make doctor`, `make test`, `make build`, `make dev`, `make preview`, `make android` and `make ios` are also available. See [cross-platform setup instructions](docs/DEVELOPER_SETUP.md). Linux distro repositories may need a newer Node.js source; iOS Xcode/Android SDK and signing remain separate prerequisites. Setup has not yet been verified end-to-end on all three operating systems.
+
+## v0.33 — Build-system modernization
+
+The supported build tool is **npm/Vite**, not Make; Make remains an optional wrapper. The repository now declares Node.js 22 (`.node-version`), npm version requirements and engine validation (`.npmrc`), common commands, a JS toolchain doctor, and host bootstrap scripts for Windows/macOS/Linux. GitHub workflows share the same dependency-install logic. [Full audit and release gates](docs/BUILD_MODERNIZATION_AUDIT.md).
+
+**Blocker:** No committed `package-lock.json` exists yet; npm registry access is unavailable from this execution environment, so an authentic lockfile cannot be generated here. [Run the lockfile workflow](../../actions/workflows/lockfile.yml), download its `fieldwork-package-lock` artifact, and commit the verified `package-lock.json`. Thereafter fresh clones use `npm ci`. Until that is done, dependency resolution is **not fully reproducible**. Neither successful production builds nor native distributions have been confirmed.
