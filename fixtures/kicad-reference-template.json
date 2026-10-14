@@ -1,0 +1,33 @@
+{
+  "schema": "fieldwork.reference.kicad.v1",
+  "notice": "TEMPLATE ONLY: values below are placeholders and MUST NOT be counted as real KiCad results.",
+  "cases": [
+    {
+      "id": "REPLACE_WITH_CAPTURE_001",
+      "operation": "microstrip.analysis",
+      "output": "impedanceOhms",
+      "source": {
+        "application": "KiCad",
+        "version": "REPLACE_WITH_ACTUAL_VERSION",
+        "captureMethod": "REPLACE_WITH_GUI_OR_PINNED_WASM",
+        "calculator": "Transmission Lines — Microstrip",
+        "frequencyGHz": 1,
+        "notes": "Record every required KiCad input and output precision"
+      },
+      "inputs": {
+        "widthMm": 0.2,
+        "heightMm": 0.18,
+        "thicknessUm": 35,
+        "er": 4.2
+      },
+      "expected": {
+        "value": null,
+        "unit": "ohm"
+      },
+      "tolerance": {
+        "absolute": 0.1,
+        "relative": 0.02
+      }
+    }
+  ]
+}
